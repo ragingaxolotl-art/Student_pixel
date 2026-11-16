@@ -60,6 +60,7 @@
      * @private
      */
     cache_: {},
+    storageError_: false,
 
     /**
      * Static method to access a user defined settings value ot its default
@@ -90,19 +91,28 @@
      * @private
      */
     readFromLocalStorage_: function (key) {
-      var value = window.localStorage[key];
-      if (typeof value != "undefined") {
-        value = JSON.parse(value);
+      try {
+        var value = window.localStorage.getItem(key);
+        return value === null ? undefined : JSON.parse(value);
+      } catch (_error) {
+        // Preferences must not stop the editor from starting. Keep existing
+        // saved data untouched and use the default for an unreadable setting.
+        this.storageError_ = true;
+        return undefined;
       }
-      return value;
     },
 
     /**
      * @private
      */
     writeToLocalStorage_: function (key, value) {
-      // TODO(grosbouddha): Catch storage exception here.
-      window.localStorage[key] = JSON.stringify(value);
+      try {
+        window.localStorage.setItem(key, JSON.stringify(value));
+      } catch (_error) {
+        // set() already updates the in-memory cache. A full quota can prevent
+        // persistence, but drawing tools and change notifications still work.
+        this.storageError_ = true;
+      }
     },
 
     /**

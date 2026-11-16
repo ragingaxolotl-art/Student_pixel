@@ -16,6 +16,11 @@
 
   ns.UserWarningController.prototype.init = function () {
     $.subscribe(
+      Events.USER_SETTINGS_CHANGED,
+      this.onPreferenceStorageChanged_.bind(this)
+    );
+    this.onPreferenceStorageChanged_();
+    $.subscribe(
       Events.PERFORMANCE_REPORT_CHANGED,
       this.onPerformanceReportChanged_.bind(this)
     );
@@ -27,6 +32,19 @@
       ns.UserWarningController.showPerformanceInfoDialog,
       this
     );
+  };
+
+  ns.UserWarningController.prototype.onPreferenceStorageChanged_ = function () {
+    if (pskl.UserSettings.storageError_ && !this.storageWarningShown_) {
+      this.storageWarningShown_ = true;
+      $.publish(Events.SHOW_NOTIFICATION, [
+        {
+          content:
+            "This browser couldn’t read or save some preferences. " +
+            "Editing still works. Save a .piskel file to keep a copy of your work."
+        }
+      ]);
+    }
   };
 
   ns.UserWarningController.prototype.destroy = function () {

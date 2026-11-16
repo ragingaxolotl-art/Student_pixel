@@ -10,6 +10,8 @@ Puppet Studio supports manually mapped layered characters, custom joints, pose m
 
 Drawings can be saved in the browser or downloaded as `.piskel` files. Browser saves belong to that browser/device. Moving artwork from the desktop test editor requires exporting and importing its `.piskel` file.
 
+Full browser storage or damaged preferences no longer prevent the tools and canvas from loading. The editor keeps usable preferences in memory and displays a notice when they cannot be saved. Existing stored data stays intact; **Save as .piskel** can still download the project.
+
 Open **Particle Studio** with the sparkle icon in **Studios**, below Palettes. Drag the studio title bar to move its window and the bottom-right grip to resize it; both are remembered in this browser. Move emitters, draw/edit paths, add position keys, adjust timing and particle properties, or start with fire, smoke, rain, snow, sparks, fountain, magic or embers. **Save effect** keeps editable settings in the project; **Generate frames** adds a locked Particle FX layer while preserving the artwork. Effects support local undo/redo and JSON import/export. The Studios launcher panel can also move with its three-line handle.
 
 ## Develop and verify
