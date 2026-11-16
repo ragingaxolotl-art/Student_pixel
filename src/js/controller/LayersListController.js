@@ -312,6 +312,10 @@
     }
   };
   proto.revealPane_ = function () {
+    var workspace = pskl.app.workspaceController;
+    if (workspace && workspace.state.collapsed.indexOf("options") !== -1) {
+      workspace.setCollapsed("options", false);
+    }
     this.scrollWithin_(this.pane.closest(".right-panels-scroller"), this.pane);
   };
   proto.onClick_ = function (e) {
@@ -399,6 +403,16 @@
       c.getWrappedPiskelController().removeLayerAt(index);
       this.commit();
     } else if (action === "subtract" || action === "fx") {
+      var workspace = pskl.app.workspaceController;
+      if (
+        workspace &&
+        workspace.state.collapsed.indexOf("options") !== -1 &&
+        this.panelKind === action &&
+        this.pendingLayer === layer
+      ) {
+        this.revealPane_();
+        return;
+      }
       if (action === "fx") {
         this.editingEffectId = null;
         this.lastPanelKind = null;
@@ -1133,6 +1147,12 @@
   };
   proto.positionPreviewTabs = function () {
     if (!this.previewTabs) {
+      return;
+    }
+    this.previewTabs.hidden = !!document.querySelector(
+      ".workspace-preview-panel.workspace-collapsed"
+    );
+    if (this.previewTabs.hidden) {
       return;
     }
     var rect = document

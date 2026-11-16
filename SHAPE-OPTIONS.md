@@ -1,22 +1,19 @@
-# Rectangle and ellipse options
+# Rectangle and ellipse colors
 
-Select the existing Rectangle or Ellipse tool. Fill, Outline color, Fill color,
-and outline Width appear beside the project title. In a narrow window, open
-**Shape options** in the same title bar.
+Select Rectangle or Ellipse for Outline, Fill and Width beside the title.
+There is no fill-mode dropdown. Fill starts transparent, so the default draws
+only an outline and leaves existing interior pixels untouched.
 
-- **Empty** is the default: draw an outline and leave the interior unchanged.
-- **Filled + outline** uses separate fill and outline colors.
-- **Fill only** draws the fill color without an outline.
+Choose a Fill color to fill the shape automatically. Choose transparent again
+to turn the fill off. A transparent Outline gives a fill-only shape; if both
+colors are transparent, no pixels change. Both swatches support opacity.
+Escape cancels an uncommitted color choice. Active color swatches have a gold
+border; the checkerboard indicates transparency.
 
-Outline color follows the primary drawing color. Fill initially follows that
-color, and can be chosen independently in its picker, including opacity or
-transparency. Border width uses the existing pen-size setting, from 1–32 pixels.
-Shift constrains a rectangle to a square and an ellipse to a circle.
+Outline follows the primary drawing color. Fill is independent and remembered
+per shape tool during the current session. A reload starts Fill transparent
+again. Width uses the existing pen-size setting (1–32 pixels). Shift constrains
+a rectangle to a square and an ellipse to a circle.
 
-Rectangle and Ellipse each retain their choices while this editor is open.
-Reloading starts both in Empty mode. Options hide when another tool is selected;
-the existing Dither tool keeps its own title-bar options.
-
-Preview and committed shapes use the same geometry. Undo/redo records the
-actual fill style and colors, so later changes to the options do not change
-older strokes. Saved .piskel files preserve the drawn pixels.
+Undo/redo retains the colors and fill used for each stroke. Saving as .piskel
+preserves the actual pixels. On narrow screens, open Shape options in the title.

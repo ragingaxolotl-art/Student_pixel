@@ -46,8 +46,8 @@ async function historyReady(page:Page,delta:number) {
 for(const tool of ['tool-rectangle','tool-circle']) {
   test(`${tool} shows inline options, starts empty and preserves interior artwork`,async({page})=>{
     await setup(page,tool,true);
-    await expect(page.getByLabel('Shape fill',{exact:true})).toHaveValue('empty');
-    await expect(page.getByRole('button',{name:'Fill color',exact:true})).toHaveAttribute('aria-disabled','true');
+    await expect(page.locator('[data-shape-mode]')).toHaveCount(0);await expect(page.getByRole('button',{name:'Fill color',exact:true})).toHaveAttribute('aria-pressed','false');
+    await expect(page.getByRole('button',{name:'Fill color',exact:true})).toBeEnabled();
     const header=(await page.locator('[data-test-id="app-header"]').boundingBox())!,control=(await page.locator('#shape-controls').boundingBox())!;
     expect(header.height).toBe(40);expect(control.y).toBeGreaterThanOrEqual(header.y);expect(control.y+control.height).toBeLessThanOrEqual(header.y+header.height);
     await color(page,'outline','#ff0000');
@@ -60,7 +60,6 @@ for(const tool of ['tool-rectangle','tool-circle']) {
   });
   test(`${tool} previews two colors, commits once, and keeps its fill through undo/redo`,async({page})=>{
     await setup(page,tool);
-    await page.getByLabel('Shape fill',{exact:true}).selectOption('solid');
     await color(page,'outline','#ff0000');await color(page,'fill','#0000ff');
     const finish=await drag(page);
     const preview=await page.evaluate(()=>Array.from(window.pskl.app.drawingController.overlayFrame.pixels));
@@ -68,14 +67,14 @@ for(const tool of ['tool-rectangle','tool-circle']) {
     expect(await pixel(page,7,7)).toBe(0xffff0000);
     expect(await pixel(page,7,3)).toBe(0xff0000ff);
     const committed=await pixels(page);expect(committed).toEqual(preview);
-    await page.getByLabel('Shape fill',{exact:true}).selectOption('empty');
+    await color(page,'fill','rgba(0,0,0,0)');
     await page.locator('.piskel-name').click();
     await historyReady(page,-1);await undo(page);await expect.poll(async()=> (await pixels(page)).some(Boolean)).toBe(false);
     await historyReady(page,1);await redo(page);await expect.poll(()=>pixels(page)).toEqual(committed);
   });
   test(`${tool} fill-only uses its fill color without an outline and shift keeps equal proportions`,async({page})=>{
     await setup(page,tool);
-    await page.getByLabel('Shape fill',{exact:true}).selectOption('fill-only');
+    await color(page,'outline','rgba(0,0,0,0)');
     await expect(page.getByLabel('Shape outline width',{exact:true})).toBeDisabled();
     await color(page,'fill','#0000ff');
     await(await drag(page,[3,3],[11,8],{shift:true}))();
@@ -93,10 +92,9 @@ for(const tool of ['tool-rectangle','tool-circle']) {
 
 test('top border width syncs with pen size, colors support alpha and project export/import preserves pixels',async({page})=>{
   await setup(page,'tool-rectangle');
-  await page.getByLabel('Shape fill',{exact:true}).selectOption('solid');
   await color(page,'outline','#ff0000');await color(page,'fill','rgba(0,0,255,0.5)');
   await page.getByLabel('Shape outline width',{exact:true}).fill('2');
-  await page.getByLabel('Shape fill',{exact:true}).focus();
+  await page.getByRole('button',{name:'Outline color',exact:true}).focus();
   expect(await page.evaluate(()=>window.pskl.app.penSizeService.getPenSize())).toBe(2);
   await(await drag(page))();
   expect(await pixel(page,7,4)).toBe(0xff0000ff);
@@ -107,21 +105,33 @@ test('top border width syncs with pen size, colors support alpha and project exp
 
 test('each shape starts empty, remembers session choices, and fresh reload restores empty defaults',async({page})=>{
   await setup(page,'tool-rectangle');
-  await page.getByLabel('Shape fill',{exact:true}).selectOption('solid');
-  await clickTool(page,'tool-circle');await expect(page.getByLabel('Shape fill',{exact:true})).toHaveValue('empty');
-  await clickTool(page,'tool-rectangle');await expect(page.getByLabel('Shape fill',{exact:true})).toHaveValue('solid');
-  await page.reload();await clickTool(page,'tool-rectangle');await expect(page.getByLabel('Shape fill',{exact:true})).toHaveValue('empty');
+  await color(page,'fill','#0000ff');
+  await clickTool(page,'tool-circle');await expect(page.locator('[data-shape-mode]')).toHaveCount(0);await expect(page.getByRole('button',{name:'Fill color',exact:true})).toHaveAttribute('aria-pressed','false');
+  await clickTool(page,'tool-rectangle');await expect(page.getByRole('button',{name:'Fill color',exact:true})).toHaveAttribute('aria-pressed','true');
+  await page.reload();await clickTool(page,'tool-rectangle');await expect(page.locator('[data-shape-mode]')).toHaveCount(0);await expect(page.getByRole('button',{name:'Fill color',exact:true})).toHaveAttribute('aria-pressed','false');
 });
 
 test('compact shape options fit a small window and color pickers work with the keyboard',async({page})=>{
   await page.setViewportSize({width:600,height:760});await openEditor(page);await clickTool(page,'tool-circle');
   await page.locator('.shape-compact').click();
   const controls=(await page.locator('#shape-controls').boundingBox())!;expect(controls.x).toBeGreaterThanOrEqual(0);expect(controls.x+controls.width).toBeLessThanOrEqual(600);
-  await page.getByLabel('Shape fill',{exact:true}).selectOption('solid');
   await page.getByRole('button',{name:'Fill color',exact:true}).focus();await page.keyboard.press('Enter');
   await expect(page.locator('.sp-container:not(.sp-hidden)')).toBeVisible();
   await page.locator('.sp-container:not(.sp-hidden) .sp-input').fill('#00ff00');await page.keyboard.press('Enter');
   await page.evaluate(()=>(window as any).$('#shape-fill-color').spectrum('hide'));
   expect(await page.evaluate(()=>window.pskl.app.toolController.currentSelectedTool.fillColor)).toBe('rgb(0, 255, 0)');
   await clickTool(page,'tool-pen');await expect(page.locator('#shape-options')).toBeHidden();
+});
+
+test('transparent fill is off by default, Escape cancels a new color, and clearing fill preserves interior artwork',async({page})=>{
+  await setup(page,'tool-rectangle',true);
+  await page.getByRole('button',{name:'Fill color',exact:true}).click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button',{name:'Fill color',exact:true})).toHaveAttribute('aria-pressed','false');
+  await color(page,'fill','#0000ff');await(await drag(page))();
+  await color(page,'fill','rgba(0,0,0,0)');await(await drag(page))();
+  expect(await pixel(page,7,7)).toBe(0xffff0000);
+  await color(page,'outline','rgba(0,0,0,0)');
+  const before=await pixels(page);await(await drag(page,[4,4],[8,8]))();
+  expect(await pixels(page)).toEqual(before);
 });

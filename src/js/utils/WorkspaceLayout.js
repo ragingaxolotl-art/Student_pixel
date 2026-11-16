@@ -11,7 +11,8 @@
       left: [],
       right: sides.slice(),
       top: [],
-      bottom: rows.slice()
+      bottom: rows.slice(),
+      collapsed: []
     };
   };
   var allowed = function (id) {
@@ -22,6 +23,11 @@
     if (!value || value.version !== 1) {
       return result;
     }
+    result.collapsed = Array.from(
+      new Set(Array.isArray(value.collapsed) ? value.collapsed : [])
+    ).filter(function (id) {
+      return sides.concat(rows, ["tools", "preview"]).indexOf(id) !== -1;
+    });
     ["tools", "preview"].forEach(function (id) {
       if (allowed(id).indexOf(value[id]) !== -1) {
         result[id] = value[id];
@@ -60,6 +66,19 @@
     defaults: defaults,
     normalize: normalize,
     allowed: allowed,
+    collapse: function (state, id, collapsed) {
+      var next = normalize(state);
+      if (sides.concat(rows, ["tools", "preview"]).indexOf(id) === -1) {
+        return next;
+      }
+      next.collapsed = next.collapsed.filter(function (item) {
+        return item !== id;
+      });
+      if (collapsed) {
+        next.collapsed.push(id);
+      }
+      return next;
+    },
     zone: function (state, id) {
       if (id === "tools" || id === "preview") {
         return state[id];

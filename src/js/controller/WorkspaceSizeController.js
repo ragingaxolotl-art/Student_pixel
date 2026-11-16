@@ -283,7 +283,8 @@
         view = scroll && scroll.getBoundingClientRect();
       b.hidden =
         !(this.drag && this.drag.key === key) &&
-        (!rect.width ||
+        ((key !== "sideWidth" && !!panel.closest(".workspace-collapsed")) ||
+          !rect.width ||
           !rect.height ||
           (view && (edge - 4 < view.top || edge + 4 > view.bottom)));
       Object.assign(b.style, {

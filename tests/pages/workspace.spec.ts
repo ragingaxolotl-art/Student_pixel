@@ -80,9 +80,10 @@ test('drag frames and layers above the canvas, reorder, then restore the default
   await page.getByRole('button', { name: 'Reset layout', exact: true }).click();
   expect((await state(page)).bottom).toEqual(['frames', 'layers']);
   const restored = (await panel(page, 'frames').boundingBox())!;
-  expect(restored.x).toBe(0);
+
   const tools = (await panel(page, 'tools').boundingBox())!;
-  expect(tools.y + tools.height).toBeLessThanOrEqual(restored.y + 1);
+  expect(restored.x).toBeCloseTo(tools.x + tools.width, 0);
+  expect(tools.y + tools.height).toBe(795);
 });
 
 test('move preview and toolbar, draw, and keep preview pinned during effects editing', async ({ page, baseURL }) => {

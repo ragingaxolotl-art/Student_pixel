@@ -28,6 +28,9 @@
     style
   ) {
     style = style || { mode: "empty" };
+    if (style.mode === "none") {
+      return;
+    }
     if (style.mode !== "empty") {
       var spans = {};
       this.getCirclePixels_(this.startCol, this.startRow, col, row, 1).forEach(

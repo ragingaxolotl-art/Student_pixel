@@ -6,9 +6,11 @@ A browser pixel-art editor based on [Piskel](https://github.com/piskelapp/piskel
 
 Drag the three-line handle on a panel to a highlighted edge to arrange your workspace. Preview, Transform, Palettes, and layer options can use either side; Preview stays pinned while the other panels scroll. Frames and Layers can sit above or below the canvas and be reordered. Tools can use the left or right edge. Click a handle for placement buttons and **Reset layout**, or focus it and use arrow keys. Escape cancels a drag. Layout preferences save in this browser; narrow windows share one side column and restore the wider arrangement when there is room again.
 
+Each panel header has a chevron to collapse or expand it. The header stays accessible; sizes and unfinished settings are retained, and collapse states save with the workspace. Tools collapses to a narrow full-height rail. **Reset layout** reopens all panels. The toolbar extends to the bottom; Frames and Layers stay between the sidebars.
+
 Resize panels with the small gold grips: tool and side-column widths, frame and layer heights, layer width, Preview, Transform, Palettes, and layer options. Sizes save independently of placement. The handles follow panels moved to another edge. Layer and visibility clicks keep the workspace still. Drag a layer's three-line handle onto a group's middle to nest it, or to a row edge to reorder. Shift-click **+** below Layers to duplicate a layer or a whole nested group.
 
-Select **Rectangle** or **Ellipse** for title-bar fill and color options. **Empty** is the default; choose **Filled + outline** or **Fill only**, set separate colors, and adjust border width. Shift constrains proportions. See [shape options](SHAPE-OPTIONS.md).
+Select **Rectangle** or **Ellipse** for title-bar Outline and Fill colors and border width. Fill starts transparent. Choosing a fill color fills the shape automatically; transparent turns it off. Set Outline transparent for a fill-only shape. See [shape options](SHAPE-OPTIONS.md).
 
 The existing Dither tool opens compact Pattern, Density, Scale and Colors controls beside the project title. Move Density to override the selected pattern with adjustable ordered dithering from 0–100%; its gold label shows when active. Choosing a pattern returns to pattern mode. Its scrollable picker contains 273 separate visual patterns and density steps. The thumbnail and brush share the same sampler at 1, 2 and 4 pixel scales.
 

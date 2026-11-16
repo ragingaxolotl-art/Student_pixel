@@ -7,12 +7,6 @@
   const p = ns.ShapeOptionsController.prototype;
   p.init = function () {
     this.root
-      .querySelector("[data-shape-mode]")
-      .addEventListener("change", (event) => {
-        this.tool.shapeMode = event.target.value;
-        this.render();
-      });
-    this.root
       .querySelector("[data-shape-width]")
       .addEventListener("change", (event) => {
         const value = Number(event.target.value);
@@ -31,6 +25,15 @@
         showPalette: true,
         palette: [["rgba(0,0,0,0)"]],
         clickoutFiresChange: true,
+        beforeShow: (color) => {
+          if (!color.getAlpha()) {
+            var candidate = window.tinycolor(
+              pskl.app.selectedColorsService.getPrimaryColor()
+            );
+            candidate.setAlpha(1);
+            picker.spectrum("set", candidate.toRgbString());
+          }
+        },
         change: (color) => {
           if (!this.tool || !color) {
             return;
@@ -63,9 +66,14 @@
     });
     this.root.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
-        this.collapse();
+        this.collapse(true);
       }
       event.stopPropagation();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !this.root.hidden) {
+        this.collapse(true);
+      }
     });
     document.addEventListener("pointerdown", (event) => {
       if (
@@ -90,38 +98,43 @@
     ].forEach((event) => $.subscribe(event, () => this.render()));
     $.subscribe(Events.DIALOG_SHOW, () => this.collapse());
   };
-  p.collapse = function () {
+  p.collapse = function (cancel) {
     this.root.classList.remove("controls-open");
     this.root
       .querySelector(".shape-compact")
       .setAttribute("aria-expanded", "false");
     ["outline", "fill"].forEach((kind) =>
-      $("#shape-" + kind + "-color").spectrum("hide")
+      $("#shape-" + kind + "-color").spectrum(
+        "hide",
+        cancel ? "cancel" : undefined
+      )
     );
   };
   p.render = function () {
     if (!this.tool) {
       return;
     }
-    const mode = this.tool.shapeMode;
-    this.root.querySelector("[data-shape-mode]").value = mode;
     this.root.querySelector("[data-shape-width]").value =
       pskl.app.penSizeService.getPenSize();
     const primary = pskl.app.selectedColorsService.getPrimaryColor();
     $("#shape-outline-color").spectrum("set", primary);
-    $("#shape-fill-color").spectrum(
-      "set",
-      this.tool.fillColor === null ? primary : this.tool.fillColor
-    );
+    $("#shape-fill-color").spectrum("set", this.tool.fillColor);
     ["outline", "fill"].forEach((kind) => {
-      const inactive =
-        kind === "outline" ? mode === "fill-only" : mode === "empty";
+      const color = kind === "outline" ? primary : this.tool.fillColor;
+      const inactive = !(pskl.utils.colorToInt(color) >>> 24);
       const picker = $("#shape-" + kind + "-color");
-      picker.spectrum(inactive ? "disable" : "enable");
-      picker.closest(".shape-field").attr("data-inactive", String(inactive));
-      picker.next(".sp-replacer").attr("aria-disabled", String(inactive));
+      picker.next(".sp-replacer").attr("aria-pressed", String(!inactive));
+      picker
+        .next(".sp-replacer")
+        .attr(
+          "title",
+          inactive
+            ? "Transparent · choose a color to enable " + kind
+            : "Choose " + kind + " color; transparent turns it off"
+        );
     });
-    this.root.querySelector("[data-shape-width]").disabled =
-      mode === "fill-only";
+    this.root.querySelector("[data-shape-width]").disabled = !(
+      pskl.utils.colorToInt(primary) >>> 24
+    );
   };
 })();

@@ -91,6 +91,7 @@
       this.docks.right.root
     );
     this.handles = {};
+    this.collapseButtons = {};
     Object.keys(this.panels).forEach(this.addHandle.bind(this));
     this.status = element("div", "workspace-sr-only", this.root);
     this.status.setAttribute("role", "status");
@@ -142,6 +143,15 @@
       panel.prepend(heading);
     }
     heading.classList.add("workspace-panel-title");
+    Array.from(heading.childNodes)
+      .filter(function (node) {
+        return node.nodeType === 3 && node.textContent.trim();
+      })
+      .forEach(function (node) {
+        var name = element("span", "workspace-panel-name");
+        name.textContent = node.textContent.trim();
+        node.replaceWith(name);
+      });
     var button = element("button", "workspace-handle");
     button.type = "button";
     button.setAttribute("aria-label", "Move " + names[id] + " panel");
@@ -166,9 +176,45 @@
       }.bind(this)
     );
     button.addEventListener("keydown", this.onHandleKey.bind(this, id));
+    var collapse = element("button", "workspace-collapse", heading);
+    collapse.type = "button";
+    collapse.dataset.workspaceCollapse = id;
+    collapse.innerHTML =
+      '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>';
+    collapse.addEventListener(
+      "click",
+      function () {
+        this.setCollapsed(id, this.state.collapsed.indexOf(id) === -1);
+      }.bind(this)
+    );
+    collapse.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.stopPropagation();
+      }
+    });
+    this.collapseButtons[id] = collapse;
+  };
+  proto.setCollapsed = function (id, collapsed) {
+    this.commit(
+      Layout.collapse(this.state, id, collapsed),
+      names[id] + (collapsed ? " collapsed" : " expanded")
+    );
   };
   proto.render = function () {
     var state = this.state;
+    Object.keys(this.panels).forEach(
+      function (id) {
+        var collapsed = state.collapsed.indexOf(id) !== -1,
+          button = this.collapseButtons[id];
+        this.panels[id].classList.toggle("workspace-collapsed", collapsed);
+        button.setAttribute("aria-expanded", String(!collapsed));
+        button.setAttribute(
+          "aria-label",
+          (collapsed ? "Expand " : "Collapse ") + names[id] + " panel"
+        );
+        button.title = (collapsed ? "Expand " : "Collapse ") + names[id];
+      }.bind(this)
+    );
     var compact = window.innerWidth < 1000;
     var visibleSides = ["left", "right"];
     visibleSides.forEach(
@@ -226,39 +272,25 @@
       }.bind(this)
     );
     var toolsWidth =
-      this.root.style.getPropertyValue("--workspace-tools-width") || "100px";
+      state.collapsed.indexOf("tools") !== -1
+        ? "54px"
+        : this.root.style.getPropertyValue("--workspace-tools-width") ||
+          "100px";
     this.column.style.left = state.tools === "left" ? toolsWidth : "0";
     this.column.style.right =
       state.tools === "right" ? "calc(50px + " + toolsWidth + ")" : "50px";
-    var bleed = this.docks[state.tools].root.classList.contains(
-      "workspace-side-empty"
-    );
-    this.center.style.setProperty(
-      "--workspace-bleed-left",
-      bleed && state.tools === "left" ? toolsWidth : "0px"
-    );
-    this.center.style.setProperty(
-      "--workspace-bleed-right",
-      bleed && state.tools === "right" ? toolsWidth : "0px"
-    );
     var rect = this.root.getBoundingClientRect();
     var tools = this.panels.tools;
     tools.style.left = state.tools === "left" ? "0" : "auto";
     tools.style.right = state.tools === "right" ? "50px" : "auto";
-    tools.style.top =
-      rect.top +
-      (bleed ? this.docks.top.getBoundingClientRect().height : 0) +
-      "px";
-    tools.style.bottom =
-      window.innerHeight -
-      rect.bottom +
-      (bleed ? this.docks.bottom.getBoundingClientRect().height : 0) +
-      "px";
+    tools.style.top = rect.top + "px";
+    tools.style.bottom = window.innerHeight - rect.bottom + "px";
     this.root.classList.toggle("workspace-compact", compact);
     this.positionTabs();
     if (pskl.app.workspaceSizeController) {
       pskl.app.workspaceSizeController.position_();
     }
+    pskl.app.drawingController.requestRelayout_();
   };
   proto.positionTabs = function () {
     if (pskl.app.layersListController) {
@@ -351,6 +383,12 @@
         );
       }.bind(this)
     );
+    add(
+      this.state.collapsed.indexOf(id) !== -1
+        ? "Expand panel"
+        : "Collapse panel",
+      this.setCollapsed.bind(this, id, this.state.collapsed.indexOf(id) === -1)
+    );
     if (id !== "tools" && id !== "preview") {
       var items = this.state[Layout.zone(this.state, id)];
       add("Move up", this.shift.bind(this, id, -1), items.indexOf(id) === 0);
@@ -434,7 +472,10 @@
       function (zone) {
         if (zone === "left" || zone === "right") {
           var isLeft = zone === "left";
-          var offset = this.state.tools === zone ? 100 : 0;
+          var offset =
+            this.state.tools === zone
+              ? this.panels.tools.getBoundingClientRect().width
+              : 0;
           return {
             zone: zone,
             x: isLeft ? root.left + offset : root.right - 50 - offset - 210,

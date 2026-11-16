@@ -10,7 +10,7 @@ describe("Filled rectangle and ellipse drawing", function () {
     it(name + " starts empty and leaves interior pixels intact", function () {
       var t = tool(), f = new pskl.model.Frame(12,12);
       f.setPixel(5,5,blue);
-      expect(t.shapeMode).toBe("empty");
+      expect(t.fillColor).toBe(Constants.TRANSPARENT_COLOR);
       t.draw(8,8,red,f,1);
       expect(f.getPixel(5,5)).toBe(blue);
       expect(f.getPixel(5,2)).toBe(red);

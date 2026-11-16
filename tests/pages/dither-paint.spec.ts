@@ -35,7 +35,7 @@ for(const width of [320,700,960])test(`paint options stay inside a ${width}px he
 });
 
 test('Paint opacity controls both custom shape fill and outline without duplicating width controls',async({page})=>{
- await openEditor(page);await seed(page);await clickTool(page,'tool-rectangle');await page.getByLabel('Shape fill',{exact:true}).selectOption('solid');
+ await openEditor(page);await seed(page);await clickTool(page,'tool-rectangle');
  await page.getByLabel('Brush opacity',{exact:true}).fill('50');await page.evaluate(()=>{window.pskl.app.toolController.currentSelectedTool.fillColor='rgba(0,0,255,0.5)';});await setPrimaryColor(page,'#ff0000');await expect(page.getByLabel('Brush size (pixels)',{exact:true})).toBeHidden();await expect(page.getByLabel('Shape outline width',{exact:true})).toBeVisible();
  const coords=await page.evaluate(()=>{const d=window.pskl.app.drawingController;return [d.getScreenCoordinates(4,4),d.getScreenCoordinates(10,10)];});await page.mouse.move(coords[0].x,coords[0].y);await page.mouse.down();await page.mouse.move(coords[1].x,coords[1].y,{steps:5});await page.mouse.up();const painted=await pixels(page);expect((painted[7*16+7] as number)>>>24).toBe(64);expect((painted[4*16+7] as number)>>>24).toBe(128);
 });

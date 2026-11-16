@@ -8,8 +8,7 @@
     // Shapes's first point coordinates (set in applyToolAt)
     this.startCol = null;
     this.startRow = null;
-    this.shapeMode = "empty";
-    this.fillColor = null;
+    this.fillColor = Constants.TRANSPARENT_COLOR;
 
     this.tooltipDescriptors = [
       { key: "shift", description: "Keep 1 to 1 ratio" }
@@ -23,17 +22,21 @@
   };
 
   ns.ShapeTool.prototype.getShapeStyle_ = function () {
+    var paint = pskl.utils.DitherPaintUtils.opacity(
+        this.fillColor,
+        pskl.UserSettings.get(pskl.UserSettings.BRUSH_OPACITY)
+      ),
+      fill = pskl.utils.colorToInt(paint) >>> 24,
+      outline = pskl.utils.colorToInt(this.getToolColor()) >>> 24;
     return {
-      mode: ["solid", "fill-only"].includes(this.shapeMode)
-        ? this.shapeMode
-        : "empty",
-      fillColor:
-        this.fillColor === null
-          ? this.getToolColor()
-          : pskl.utils.DitherPaintUtils.opacity(
-              this.fillColor,
-              pskl.UserSettings.get(pskl.UserSettings.BRUSH_OPACITY)
-            )
+      mode: fill
+        ? outline
+          ? "solid"
+          : "fill-only"
+        : outline
+          ? "empty"
+          : "none",
+      fillColor: paint
     };
   };
 

@@ -34,8 +34,8 @@
 }
 .workspace-stack {
   flex-shrink: 0;
-  margin-left: calc(-1 * var(--workspace-bleed-left, 0px));
-  margin-right: calc(-1 * var(--workspace-bleed-right, 0px));
+  margin-left: 0;
+  margin-right: 0;
   background: #1d1d1d;
   z-index: 12;
 }
@@ -83,6 +83,79 @@
     sans-serif;
   line-height: 24px;
   user-select: none;
+}
+.workspace-panel-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.workspace-collapse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 24px;
+  padding: 3px;
+  margin: 0 0 0 auto;
+  border: 0;
+  border-radius: 0;
+  color: #aaa;
+  background: transparent;
+  cursor: pointer;
+}
+.workspace-collapse svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+.workspace-collapse[aria-expanded="false"] svg {
+  transform: rotate(-90deg);
+}
+.workspace-collapse:hover {
+  color: gold;
+  background: #414141;
+}
+.workspace-collapse:focus-visible {
+  outline: 2px solid gold;
+  outline-offset: -2px;
+}
+.workspace-enabled .workspace-panel.workspace-collapsed {
+  height: auto !important;
+  min-height: 0 !important;
+  flex: 0 0 auto !important;
+  overflow: hidden;
+}
+.workspace-panel.workspace-collapsed > :not(.workspace-panel-title) {
+  display: none !important;
+}
+.workspace-collapsed .transformations-show-more-link {
+  display: none;
+}
+.workspace-sized #tool-section.workspace-collapsed {
+  width: 54px;
+}
+#tool-section.workspace-collapsed .workspace-panel-name,
+.workspace-narrow-tools #tool-section .workspace-panel-name {
+  display: none;
+}
+#tool-section.workspace-collapsed .workspace-handle,
+.workspace-narrow-tools #tool-section .workspace-handle {
+  width: 24px;
+  flex-basis: 24px;
+  margin-right: 0;
+}
+#tool-section.workspace-collapsed .workspace-panel-title,
+.workspace-narrow-tools #tool-section .workspace-panel-title {
+  padding-right: 0;
+}
+.layer-preview-tabs[hidden] {
+  display: none;
 }
 .workspace-handle {
   display: inline-flex;

@@ -48,4 +48,17 @@ describe("Workspace layout", function () {
     expect(next.bottom).toEqual([]);
     expect(layout.zone(next, "frames")).toBe("top");
   });
+  it("sanitizes and deduplicates saved collapse states without changing older layouts", function () {
+    var input=layout.defaults();input.collapsed=["preview","unknown","layers","preview",null];
+    expect(layout.normalize(input).collapsed).toEqual(["preview","layers"]);
+    expect(layout.normalize({version:1,collapsed:{layers:true}}).collapsed).toEqual([]);
+  });
+  it("collapses independently, preserves state when moving panels, and leaves inputs intact", function () {
+    var original=layout.defaults(), next=layout.collapse(original,"layers",true);
+    next=layout.collapse(next,"palettes",true);next=layout.move(next,"layers","top");
+    expect(next.collapsed).toEqual(["layers","palettes"]);
+    expect(original.collapsed).toEqual([]);
+    expect(layout.collapse(next,"layers",false).collapsed).toEqual(["palettes"]);
+    expect(layout.collapse(next,"unknown",true)).toEqual(next);
+  });
 });

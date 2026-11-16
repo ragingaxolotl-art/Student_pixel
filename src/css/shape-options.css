@@ -27,7 +27,6 @@
     sans-serif;
   color: #bbb;
 }
-.shape-field select,
 .shape-field input[type="number"],
 .shape-compact {
   box-sizing: border-box;
@@ -41,9 +40,6 @@
   font:
     11px Arial,
     sans-serif;
-}
-.shape-field select {
-  width: 110px;
 }
 .shape-color-field .sp-replacer {
   box-sizing: border-box;
@@ -66,15 +62,14 @@
 .shape-width-field input {
   width: 46px;
 }
-.shape-field select:focus-visible,
 .shape-field input:focus-visible,
 .shape-field .sp-replacer:focus-visible,
 .shape-compact:focus-visible {
   outline: 2px solid gold;
   outline-offset: 1px;
 }
-.shape-field[data-inactive="true"] {
-  opacity: 0.45;
+.shape-color-field .sp-replacer[aria-pressed="true"] {
+  border-color: #a29351;
 }
 .shape-compact {
   display: none;

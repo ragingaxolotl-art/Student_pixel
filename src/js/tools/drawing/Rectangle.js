@@ -35,6 +35,9 @@
     );
 
     style = style || { mode: "empty" };
+    if (style.mode === "none") {
+      return;
+    }
     for (
       var x = Math.max(0, rectangle.x0);
       x <= Math.min(targetFrame.getWidth() - 1, rectangle.x1);
