@@ -50,6 +50,7 @@ exports.scripts = [
   "js/utils/UserSettings.js",
   "js/utils/Uuid.js",
   "js/utils/WorkerUtils.js",
+  "js/utils/WorkspaceLayout.js",
   "js/utils/Xhr.js",
   "js/utils/serialization/Serializer.js",
   "js/utils/serialization/Deserializer.js",
@@ -130,6 +131,7 @@ exports.scripts = [
   "js/controller/TransformationsController.js",
   "js/controller/CanvasBackgroundController.js",
   "js/controller/UserWarningController.js",
+  "js/controller/WorkspaceController.js",
 
   // Settings sub-controllers
   "js/controller/settings/AbstractSettingController.js",

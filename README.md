@@ -4,6 +4,8 @@ A browser pixel-art editor based on [Piskel](https://github.com/piskelapp/piskel
 
 **Website:** https://ragingaxolotl-art.github.io/Student_pixel/
 
+Drag the three-line handle on a panel to a highlighted edge to arrange your workspace. Preview, Transform, Palettes, and layer options can use either side; Preview stays pinned while the other panels scroll. Frames and Layers can sit above or below the canvas and be reordered. Tools can use the left or right edge. Click a handle for placement buttons and **Reset layout**, or focus it and use arrow keys. Escape cancels a drag. Layout preferences save in this browser; narrow windows share one side column and restore the wider arrangement when there is room again.
+
 Puppet Studio supports manually mapped layered characters, custom joints, pose markers, walking guides, editable joint motion paths, and locks saved independently with each pose. Lock/unlock records the current marker; different markers that shared a pose stay independent. See [the studio guide](PUPPET-STUDIO.md).
 
 Drawings can be saved in the browser or downloaded as `.piskel` files. Browser saves belong to that browser/device. Moving artwork from the desktop test editor requires exporting and importing its `.piskel` file.

@@ -227,6 +227,9 @@
       );
       this.clipboardService.init();
 
+      this.workspaceController = new pskl.controller.WorkspaceController();
+      this.workspaceController.init();
+
       this.drawingLoop = new pskl.rendering.DrawingLoop();
       this.drawingLoop.addCallback(this.render, this);
       this.drawingLoop.start();
