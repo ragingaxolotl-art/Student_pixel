@@ -1,0 +1,15 @@
+# Puppet Studio animator controls
+
+Open the figure button below Palettes and choose the starting artwork frame. The main editor keeps Frames and Layers along the bottom; no workspace panels are relocated by this update.
+
+- **Setup rig** fits pivots, lengths, parents and artwork bindings. Click a visible part to select its assigned joint. Unbound foreground artwork is identified separately; choose a joint and **Bind selected art** to assign it. Original layer order and source pixels stay intact.
+- **Pose / animate** edits the working pose. Clicking bound artwork highlights it and shows **Transform part** handles: center Move, circular Rotate, side/bottom Scale X/Y, corner Scale, upper corner Shear. Hover identifies each handle. Drag or focus a handle and press an arrow key; Shift makes a finer keyboard adjustment. Escape cancels a drag. Each completed gesture is one undoable edit.
+- **Connect joints**: in Setup, drag a child's joint onto the desired parent joint. Green indicates a valid attachment, red an invalid one. The new hierarchy carries attached parts when the parent moves. **Disconnect joints** exposes clickable dashed connection lines, also accessible with Enter/Space. **Disconnect selected** and the parent dropdown use the same position-preserving operation. Cycles and detaching a split joint from its source are rejected.
+- Disconnecting, reconnecting, or removing an ordinary parent preserves surviving parts' rest, working and saved pose matrices, including per-pose pins, rotation, scale and shear. In-between poses are then calculated using the new hierarchy. Edits that require transforms outside the existing supported range, or conflict with a saved motion path, fail without changing the rig. Split-joint removal still joins its original segment.
+- **Auto-key** is optional and starts off. When enabled, a completed joint/part gesture or a changed numeric pose transform records the selected timeline frame. Other markers that share the same named pose receive their own copy when needed. Inserting a key inside a protected joint-motion-path interval is rejected; edit its endpoint poses or revise/remove the path first. With Auto-key off, use **+ Pose / replace** to record the working pose.
+- A locked pivot stays in place while its part rotates, scales or shears. Unlock it before using Move. Pins remain per pose.
+- **Display** offers All artwork, Dim other parts and Only selected part, plus joint size, guide line width and guide color. These are saved browser view preferences. They do not alter source art, effects, rig data or generated frames. Onion skins remain available with focused previews.
+
+**Save Rig** retains the rig. **Generate Frames** bakes the animation into the main timeline. Studio Undo/Redo and project download/import preserve rig edits.
+
+Validation includes matrix preservation across saved poses and pins; actual pointer/keyboard gestures; selection through the layer stack; Auto-key/shared-pose/path boundaries; source pixels and layer order; generated-frame equivalence with solo preview; cancel/undo/redo; project round trips; and small-window layout.

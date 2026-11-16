@@ -27,6 +27,7 @@
     DITHER_SETTINGS: "DITHER_SETTINGS",
     DITHER_FAVORITES: "DITHER_FAVORITES",
     WORKSPACE_LAYOUT: "WORKSPACE_LAYOUT",
+    PUPPET_STUDIO_VIEW: "PUPPET_STUDIO_VIEW",
     PREFERENCES_TAB: "PREFERENCES_TAB",
     KEY_TO_DEFAULT_VALUE_MAP_: {
       GRID_COLOR: Constants.TRANSPARENT_COLOR,
@@ -68,6 +69,12 @@
       },
       DITHER_FAVORITES: [],
       WORKSPACE_LAYOUT: {},
+      PUPPET_STUDIO_VIEW: {
+        focus: "all",
+        jointSize: 5,
+        lineWidth: 1.25,
+        color: "#55e1df"
+      },
       PREFERENCES_TAB: "misc"
     },
 

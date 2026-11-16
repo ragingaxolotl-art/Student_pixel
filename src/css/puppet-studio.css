@@ -792,3 +792,94 @@
   padding: 3px 7px;
   margin-right: 5px;
 }
+.puppet-dialog .puppet-editor-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 0 0 100%;
+}
+.puppet-dialog .puppet-editor-bar [role="tablist"] {
+  display: flex;
+  gap: 3px;
+}
+.puppet-dialog [role="tab"][aria-selected="true"] {
+  background: #514719;
+  color: gold;
+  border-color: #a58d39;
+}
+.puppet-dialog .puppet-editor-hint {
+  color: #c5c5c5;
+  font:
+    11px Arial,
+    sans-serif;
+}
+.puppet-dialog [data-rig-stage="setup"] .puppet-editor-hint {
+  color: #e8c581;
+}
+.puppet-dialog .puppet-art-selection {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding: 6px;
+  flex-shrink: 0;
+  background: #323232;
+  border-bottom: 1px solid #555;
+  font-size: 11px;
+}
+.puppet-dialog .puppet-art-selection > span {
+  flex: 0 0 100%;
+  color: gold;
+  overflow-wrap: anywhere;
+}
+.puppet-dialog .puppet-art-selection button {
+  padding: 3px 5px;
+  font-size: 11px;
+}
+.puppet-dialog .puppet-form label[hidden],
+.puppet-dialog .puppet-form details[hidden],
+.puppet-dialog .puppet-form button[hidden] {
+  display: none !important;
+}
+.puppet-dialog .rig-vector-overlay {
+  overflow: visible;
+}
+.puppet-dialog [data-rig-transform] {
+  cursor: move;
+}
+.puppet-dialog [data-rig-transform="rotate"] {
+  cursor: grab;
+}
+.puppet-dialog [data-rig-transform="scale-x"] {
+  cursor: ew-resize;
+}
+.puppet-dialog [data-rig-transform="scale-y"] {
+  cursor: ns-resize;
+}
+.puppet-dialog [data-rig-transform="scale"] {
+  cursor: nwse-resize;
+}
+.puppet-dialog [data-rig-transform="shear"] {
+  cursor: ew-resize;
+}
+.puppet-dialog [data-rig-transform]:focus,
+.puppet-dialog [data-rig-unlink]:focus {
+  outline: 2px solid white;
+}
+.puppet-dialog [data-rig-unlink] {
+  cursor: pointer;
+}
+.puppet-dialog .puppet-timeline-tools {
+  flex-wrap: wrap;
+}
+.puppet-dialog .puppet-timeline-tools > label {
+  width: auto;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0;
+  font-size: 11px;
+}
+.puppet-dialog [aria-label="Auto-key poses"] {
+  accent-color: #ef9b68;
+}

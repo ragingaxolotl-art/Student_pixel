@@ -247,6 +247,11 @@
       : "skin:" + bone.group;
   };
   ns.RigStudioRenderer.prototype.groups = function (pose, local) {
+    var cacheKey = JSON.stringify(pose) + "|" + !!local;
+    this.groupCache = this.groupCache || new Map();
+    if (this.groupCache.has(cacheKey)) {
+      return this.groupCache.get(cacheKey);
+    }
     var world = r.world(this.rig, pose),
       groups = new Map(),
       bones = this.rig.bones.slice().sort(function (a, b) {
@@ -322,6 +327,10 @@
         }.bind(this)
       );
     }
+    if (this.groupCache.size >= 3) {
+      this.groupCache.clear();
+    }
+    this.groupCache.set(cacheKey, groups);
     return groups;
   };
   ns.RigStudioRenderer.prototype.frame = function (pose) {
@@ -403,7 +412,12 @@
       return a.slot - b.slot;
     });
   };
-  ns.RigStudioRenderer.prototype.scene = function (pose, current, ghosts) {
+  ns.RigStudioRenderer.prototype.scene = function (
+    pose,
+    current,
+    ghosts,
+    view
+  ) {
     if (!this.rig.bones.length) {
       return ns.LayerUtils.flattenFrameAt(
         this.project.getLayers(),
@@ -421,6 +435,12 @@
     );
     this.stack(pose).forEach(
       function (entry) {
+        var focus = ns.RigEditorUtils
+          ? ns.RigEditorUtils.weight(this, entry, view)
+          : 1;
+        if (!focus) {
+          return;
+        }
         if (entry.kind === "layer") {
           if (
             !entry.bound &&
@@ -442,12 +462,12 @@
               ns.LayerBlendUtils.draw(
                 canvas,
                 source,
-                opacity,
+                opacity * focus,
                 blend.operation,
                 Number(blend.params.amount) / 100
               );
             } else {
-              ctx.globalAlpha = opacity;
+              ctx.globalAlpha = opacity * focus;
               ctx.drawImage(ns.FrameUtils.toImage(source), 0, 0);
               ctx.globalAlpha = 1;
             }
@@ -463,13 +483,15 @@
             gc.globalCompositeOperation = "source-in";
             gc.fillStyle = onion.color;
             gc.fillRect(0, 0, image.width, image.height);
-            ctx.globalAlpha = 0.25;
+            ctx.globalAlpha = 0.25 * focus;
             ctx.drawImage(image, 0, 0);
             ctx.globalAlpha = 1;
           });
           var frame = groups.get(entry.name);
           if (frame) {
+            ctx.globalAlpha = focus;
             ctx.drawImage(ns.FrameUtils.toImage(frame), 0, 0);
+            ctx.globalAlpha = 1;
           }
         }
       }.bind(this)

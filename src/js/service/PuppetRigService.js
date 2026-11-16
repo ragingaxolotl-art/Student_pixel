@@ -218,6 +218,21 @@
       var world = r.world(rig, {}),
         parent = bone.parent ? world[bone.parent] : null,
         base = parent ? parent.endMatrix : r.identity();
+      if (!bone.deformSource) {
+        rig.bones.forEach(function (b) {
+          if (b.deformSource === bone.id) {
+            delete b.deformSource;
+            delete b.articulation;
+          }
+        });
+        rig.bones
+          .filter(function (b) {
+            return b.parent === bone.id;
+          })
+          .forEach(function (b) {
+            r.reparent(rig, b.id, bone.parent);
+          });
+      }
       if (bone.deformSource && bone.parent) {
         var joined = rig.bones.find(function (b) {
           return b.id === bone.parent;
@@ -234,7 +249,7 @@
         ]);
       }
       rig.bones.forEach(function (b) {
-        if (b.parent === bone.id) {
+        if (bone.deformSource && b.parent === bone.id) {
           var start = r.point(
               r.inverse(base),
               world[b.id].start.x,
@@ -269,12 +284,7 @@
       if (!bone) {
         throw new Error("Choose a bone.");
       }
-      var world = r.world(rig, {}),
-        w = world[bone.id];
-      bone.parent = null;
-      bone.x = w.start.x;
-      bone.y = w.start.y;
-      bone.angle = (Math.atan2(w.matrix[1], w.matrix[0]) * 180) / Math.PI;
+      r.reparent(rig, bone.id, null);
     } else if (action === "ik") {
       rig.workingPose = r.solveIK(
         rig,

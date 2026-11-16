@@ -185,6 +185,7 @@ exports.scripts = [
   "js/utils/RigConnectorUtils.js",
   "js/utils/JointMotionPathUtils.js",
   "js/utils/RigSegmentDeform.js",
+  "js/utils/RigEditorUtils.js",
   "js/utils/RigStudioRenderer.js",
   "js/utils/PuppetStudioDefinition.js",
   "js/controller/dialogs/PuppetStudioHost.js",
@@ -202,6 +203,9 @@ exports.scripts = [
   "js/controller/dialogs/ParticleStudioDialogController.js",
   "js/controller/dialogs/ParticleStudioInteraction.js",
   "js/controller/dialogs/PuppetStudioHistory.js",
+  "js/controller/dialogs/PuppetAnimatorControls.js",
+  "js/controller/dialogs/PuppetTransformControls.js",
+  "js/controller/dialogs/PuppetConnectionControls.js",
   "js/controller/dialogs/DialogsController.js",
 
   // Widgets

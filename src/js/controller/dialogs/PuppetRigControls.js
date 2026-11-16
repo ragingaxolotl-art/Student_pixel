@@ -3,6 +3,13 @@
     r = pskl.utils.RigStudioUtils,
     clone = pskl.utils.ToolStateUtils.clone;
   proto.loadRigBone = function (id, rig, kind) {
+    if (
+      this.selectedArt &&
+      !this.selectedArt.unbound &&
+      this.selectedArt.boneId !== id
+    ) {
+      this.selectedArt = null;
+    }
     rig = rig || r.config(pskl.app.piskelController.getPiskel());
     var b = rig.bones.find(function (b) {
       return b.id === id;
@@ -234,7 +241,7 @@
           ? r.poseAt(rig, clip, index)
           : rig.workingPose;
     };
-    plan.render = function (index) {
+    plan.render = function (index, view) {
       var pose = r.isSetupMode(o.editMode)
           ? {}
           : animate
@@ -252,7 +259,7 @@
       var sourceFrame = animate
         ? Math.min(index, p.getFrameCount() - 1)
         : Math.min(rig.referenceFrame - 1, p.getFrameCount() - 1);
-      return renderer.scene(pose, sourceFrame, ghosts);
+      return renderer.scene(pose, sourceFrame, ghosts, view);
     };
     return plan;
   };
@@ -264,7 +271,7 @@
       .forEach(function (svg) {
         svg.remove();
       });
-    if (!plan || plan.id !== "rig" || !plan.options.skeleton) {
+    if (!plan || plan.id !== "rig") {
       return;
     }
     var canvas = owner.wrapper.querySelector('[data-art-preview="after"]'),
@@ -283,6 +290,11 @@
       world = r.world(plan.rig, shown),
       sx = width / canvas.width,
       sy = height / canvas.height;
+    var guideStyle = this.animatorView || {
+      jointSize: 5,
+      lineWidth: 1.25,
+      color: "#55e1df"
+    };
     svg.classList.add("rig-vector-overlay");
     svg.setAttribute("viewBox", "0 0 " + width + " " + height);
     svg.setAttribute("aria-label", "Skeleton guides and bone names");
@@ -303,91 +315,100 @@
     if (this.drawPuppetExtras) {
       this.drawPuppetExtras(svg, element, sx, sy);
     }
-    plan.rig.bones.forEach(function (b) {
-      var w = world[b.id],
-        pin = r.jointPin(b, shown),
-        selected = b.id === plan.options.bone,
-        color = selected ? "#ffe600" : "#55e1df",
-        x = w.end.x * sx,
-        y = w.end.y * sy;
-      var parentBone = plan.rig.bones.find(function (parent) {
-        return parent.id === b.parent;
-      });
-      if (parentBone && parentBone.connector) {
-        var hub = world[parentBone.id];
-        element("line", {
-          x1: hub.end.x * sx,
-          y1: hub.end.y * sy,
-          x2: w.start.x * sx,
-          y2: w.start.y * sy,
-          stroke: color,
-          "stroke-width": 1.25,
-          "stroke-dasharray": "3 2",
-          "data-connector-link": b.id,
-          "vector-effect": "non-scaling-stroke"
+    plan.rig.bones
+      .filter(function () {
+        return plan.options.skeleton;
+      })
+      .forEach(function (b) {
+        var w = world[b.id],
+          pin = r.jointPin(b, shown),
+          selected = b.id === plan.options.bone,
+          color = selected ? "#ffe600" : guideStyle.color,
+          x = w.end.x * sx,
+          y = w.end.y * sy;
+        var parentBone = plan.rig.bones.find(function (parent) {
+          return parent.id === b.parent;
         });
-      }
-      if (!b.connector) {
-        element("line", {
-          x1: w.start.x * sx,
-          y1: w.start.y * sy,
-          x2: x,
-          y2: y,
-          stroke: color,
-          "stroke-width": 1.25,
-          "vector-effect": "non-scaling-stroke"
-        });
-      }
-      element("circle", {
-        cx: w.start.x * sx,
-        cy: w.start.y * sy,
-        r: b.connector ? 5 : 2.5,
-        fill: b.connector ? "#252525" : pin ? "#d998ff" : color,
-        stroke: pin ? "#ffffff" : b.connector ? color : "#202020",
-        "stroke-width": pin || b.connector ? 2 : 1,
-        "data-joint-id": b.id,
-        "data-joint-locked": String(!!pin),
-        "data-joint-type": b.connector ? "connector" : "joint"
-      });
-      if (pin) {
-        element("rect", {
-          x: w.start.x * sx - 5,
-          y: w.start.y * sy - 5,
-          width: 10,
-          height: 10,
-          fill: "none",
-          stroke: "#d998ff",
-          "stroke-width": 1.5
-        });
-      }
-      if (!b.connector) {
-        element("rect", {
-          x: x - 3,
-          y: y - 3,
-          width: 6,
-          height: 6,
-          fill: "#202020",
-          stroke: color,
-          "stroke-width": 1.25
-        });
-      }
-      if (plan.options.labels) {
-        var left = x < width * 0.45,
-          text = element("text", {
-            x: x + (left ? -7 : 7),
-            y: y - 6,
-            "text-anchor": left ? "end" : "start",
-            fill: selected ? "#ffe600" : "#ffffff",
-            stroke: "#171717",
-            "stroke-width": 3,
-            "paint-order": "stroke fill",
-            "font-family": "Arial, sans-serif",
-            "font-size": 11,
-            "font-weight": 600
+        if (parentBone && parentBone.connector) {
+          var hub = world[parentBone.id];
+          element("line", {
+            x1: hub.end.x * sx,
+            y1: hub.end.y * sy,
+            x2: w.start.x * sx,
+            y2: w.start.y * sy,
+            stroke: color,
+            "stroke-width": guideStyle.lineWidth,
+            "stroke-dasharray": "3 2",
+            "data-connector-link": b.id,
+            "vector-effect": "non-scaling-stroke"
           });
-        text.textContent = b.name;
-      }
-    });
+        }
+        if (!b.connector) {
+          element("line", {
+            x1: w.start.x * sx,
+            y1: w.start.y * sy,
+            x2: x,
+            y2: y,
+            stroke: color,
+            "stroke-width": guideStyle.lineWidth,
+            "vector-effect": "non-scaling-stroke"
+          });
+        }
+        element("circle", {
+          cx: w.start.x * sx,
+          cy: w.start.y * sy,
+          r: b.connector
+            ? Math.max(5, guideStyle.jointSize / 2)
+            : guideStyle.jointSize / 2,
+          fill: b.connector ? "#252525" : pin ? "#d998ff" : color,
+          stroke: pin ? "#ffffff" : b.connector ? color : "#202020",
+          "stroke-width": pin || b.connector ? 2 : 1,
+          "data-joint-id": b.id,
+          "data-joint-locked": String(!!pin),
+          "data-joint-type": b.connector ? "connector" : "joint"
+        });
+        if (pin) {
+          element("rect", {
+            x: w.start.x * sx - 5,
+            y: w.start.y * sy - 5,
+            width: 10,
+            height: 10,
+            fill: "none",
+            stroke: "#d998ff",
+            "stroke-width": 1.5
+          });
+        }
+        if (!b.connector) {
+          element("rect", {
+            x: x - 3,
+            y: y - 3,
+            width: 6,
+            height: 6,
+            fill: "#202020",
+            stroke: color,
+            "stroke-width": 1.25
+          });
+        }
+        if (plan.options.labels) {
+          var left = x < width * 0.45,
+            text = element("text", {
+              x: x + (left ? -7 : 7),
+              y: y - 6,
+              "text-anchor": left ? "end" : "start",
+              fill: selected ? "#ffe600" : "#ffffff",
+              stroke: "#171717",
+              "stroke-width": 3,
+              "paint-order": "stroke fill",
+              "font-family": "Arial, sans-serif",
+              "font-size": 11,
+              "font-weight": 600
+            });
+          text.textContent = b.name;
+        }
+      });
+    if (this.drawAnimatorOverlay) {
+      this.drawAnimatorOverlay(svg, element, sx, sy);
+    }
     canvas.parentElement.appendChild(svg);
   };
   proto.initRigUI = function () {
@@ -444,6 +465,9 @@
       }.bind(this)
     );
     this.initPuppetStudio();
+    if (this.initAnimatorUI) {
+      this.initAnimatorUI();
+    }
     var coordinate = function (event, canvas) {
       var rect = canvas.getBoundingClientRect();
       return {
@@ -465,6 +489,9 @@
           this.handleMotionPointerDown &&
           this.handleMotionPointerDown(event)
         ) {
+          return;
+        }
+        if (this.handleAnimatorPointer && this.handleAnimatorPointer(event)) {
           return;
         }
         var canvas = event.target.closest('[data-art-preview="after"]');
@@ -575,6 +602,9 @@
             return;
           }
           owner.stopPreview_();
+          if (this.autoKey && o.previewAnimation) {
+            this.write("rig", { keyFrame: shownFrame + 1 });
+          }
           form.elements["rig-previewAnimation"].checked = false;
           event.preventDefault();
           owner.wrapper.setPointerCapture(event.pointerId);
@@ -693,8 +723,7 @@
         this.refreshRig(true, drag.id);
         return;
       }
-      this.service
-        .performRig("save-draft", this.read("rig"), this)
+      this.commitAnimatorPose(this.rigDragDraft, drag.id)
         .then(
           function (message) {
             form.querySelector('[role="status"]').textContent = message;
