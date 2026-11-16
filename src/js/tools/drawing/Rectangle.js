@@ -24,7 +24,8 @@
     row,
     color,
     targetFrame,
-    penSize
+    penSize,
+    style
   ) {
     var rectangle = pskl.PixelUtils.getOrderedRectangleCoordinates(
       this.startCol,
@@ -33,15 +34,26 @@
       row
     );
 
-    for (var x = rectangle.x0; x <= rectangle.x1; x++) {
-      for (var y = rectangle.y0; y <= rectangle.y1; y++) {
-        if (
+    style = style || { mode: "empty" };
+    for (
+      var x = Math.max(0, rectangle.x0);
+      x <= Math.min(targetFrame.getWidth() - 1, rectangle.x1);
+      x++
+    ) {
+      for (
+        var y = Math.max(0, rectangle.y0);
+        y <= Math.min(targetFrame.getHeight() - 1, rectangle.y1);
+        y++
+      ) {
+        var edge =
           x > rectangle.x1 - penSize ||
           x < rectangle.x0 + penSize ||
           y > rectangle.y1 - penSize ||
-          y < rectangle.y0 + penSize
-        ) {
+          y < rectangle.y0 + penSize;
+        if (style.mode !== "fill-only" && edge) {
           targetFrame.setPixel(x, y, color);
+        } else if (style.mode !== "empty") {
+          targetFrame.setPixel(x, y, style.fillColor);
         }
       }
     }

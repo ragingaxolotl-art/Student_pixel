@@ -1,0 +1,45 @@
+<div id="shape-options" class="shape-options" hidden aria-label="Shape options">
+  <button
+    type="button"
+    class="shape-compact"
+    aria-expanded="false"
+    aria-controls="shape-controls"
+  >
+    Shape options ▾
+  </button>
+  <div id="shape-controls" class="shape-controls">
+    <label class="shape-field"
+      >Fill
+      <select data-shape-mode aria-label="Shape fill">
+        <option value="empty">Empty</option>
+        <option value="solid">Filled + outline</option>
+        <option value="fill-only">Fill only</option>
+      </select>
+    </label>
+    <label class="shape-field shape-color-field"
+      >Outline
+      <input
+        id="shape-outline-color"
+        type="text"
+        aria-label="Shape outline color"
+      >
+    </label>
+    <label class="shape-field shape-color-field"
+      >Fill color
+      <input id="shape-fill-color" type="text" aria-label="Shape fill color">
+    </label>
+    <label class="shape-field shape-width-field"
+      >Width
+      <input
+        type="number"
+        data-shape-width
+        aria-label="Shape outline width"
+        min="1"
+        max="32"
+        step="1"
+        value="1"
+        title="Outline width in sprite pixels"
+      >
+    </label>
+  </div>
+</div>

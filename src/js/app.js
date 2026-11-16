@@ -215,6 +215,10 @@
         new pskl.controller.DitherOptionsController();
       this.ditherOptionsController.init();
 
+      this.shapeOptionsController =
+        new pskl.controller.ShapeOptionsController();
+      this.shapeOptionsController.init();
+
       this.fileDropperService = new pskl.service.FileDropperService(
         this.piskelController
       );

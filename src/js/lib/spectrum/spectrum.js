@@ -671,7 +671,11 @@
 
             // Update the text entry input as it changes happen
             if (opts.showInput) {
-                var displayFormat = pskl.UserSettings.get(pskl.UserSettings.COLOR_FORMAT);
+                // Hex RGB cannot retain opacity when the text field is parsed
+                // again on blur. Alpha-enabled pickers need RGBA here.
+                var displayFormat = opts.showAlpha && currentAlpha < 1
+                    ? "rgb"
+                    : pskl.UserSettings.get(pskl.UserSettings.COLOR_FORMAT);
                 textInput.val(realColor.toString(displayFormat));
             }
 

@@ -8,6 +8,8 @@
     // Shapes's first point coordinates (set in applyToolAt)
     this.startCol = null;
     this.startRow = null;
+    this.shapeMode = "empty";
+    this.fillColor = null;
 
     this.tooltipDescriptors = [
       { key: "shift", description: "Keep 1 to 1 ratio" }
@@ -18,6 +20,15 @@
 
   ns.ShapeTool.prototype.supportsDynamicPenSize = function () {
     return true;
+  };
+
+  ns.ShapeTool.prototype.getShapeStyle_ = function () {
+    return {
+      mode: ["solid", "fill-only"].includes(this.shapeMode)
+        ? this.shapeMode
+        : "empty",
+      fillColor: this.fillColor === null ? this.getToolColor() : this.fillColor
+    };
   };
 
   /**
@@ -33,10 +44,18 @@
     $.publish(Events.DRAG_START, [col, row]);
     this.startCol = col;
     this.startRow = row;
+    this.activeShapeStyle_ = this.getShapeStyle_();
 
     // Drawing the first point of the rectangle in the fake overlay canvas:
     var penSize = pskl.app.penSizeService.getPenSize();
-    this.draw(col, row, this.getToolColor(), overlay, penSize);
+    this.draw(
+      col,
+      row,
+      this.getToolColor(),
+      overlay,
+      penSize,
+      this.activeShapeStyle_
+    );
   };
 
   ns.ShapeTool.prototype.moveToolAt = function (
@@ -57,7 +76,14 @@
 
     // draw in overlay
     var penSize = pskl.app.penSizeService.getPenSize();
-    this.draw(coords.col, coords.row, color, overlay, penSize);
+    var style = Object.assign(
+      {},
+      this.activeShapeStyle_ || this.getShapeStyle_()
+    );
+    if (!(pskl.utils.colorToInt(style.fillColor) >>> 24)) {
+      style.fillColor = Constants.SELECTION_TRANSPARENT_COLOR;
+    }
+    this.draw(coords.col, coords.row, color, overlay, penSize, style);
   };
 
   /**
@@ -74,7 +100,8 @@
     var coords = this.getCoordinates_(col, row, event);
     var color = this.getToolColor();
     var penSize = pskl.app.penSizeService.getPenSize();
-    this.draw(coords.col, coords.row, color, frame, penSize);
+    var style = this.activeShapeStyle_ || this.getShapeStyle_();
+    this.draw(coords.col, coords.row, color, frame, penSize, style);
 
     $.publish(Events.DRAG_END);
     this.raiseSaveStateEvent({
@@ -83,8 +110,10 @@
       startCol: this.startCol,
       startRow: this.startRow,
       color: color,
-      penSize: penSize
+      penSize: penSize,
+      shapeStyle: Object.assign({}, style)
     });
+    this.activeShapeStyle_ = null;
   };
 
   /**
@@ -98,7 +127,8 @@
       replayData.row,
       replayData.color,
       frame,
-      replayData.penSize
+      replayData.penSize,
+      replayData.shapeStyle
     );
   };
 
@@ -131,8 +161,8 @@
     var absY = Math.abs(dY);
 
     var delta = Math.min(absX, absY);
-    row = this.startRow - (dY / absY) * delta;
-    col = this.startCol - (dX / absX) * delta;
+    row = this.startRow - Math.sign(dY) * delta;
+    col = this.startCol - Math.sign(dX) * delta;
 
     return {
       col: col,

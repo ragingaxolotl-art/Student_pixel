@@ -117,6 +117,7 @@ exports.scripts = [
   "js/controller/FramesListController.js",
   "js/controller/HeaderController.js",
   "js/controller/DitherOptionsController.js",
+  "js/controller/ShapeOptionsController.js",
   "js/controller/WorkspaceSizeController.js",
   "js/controller/LayersListController.js",
   "js/controller/LayerGroupsController.js",

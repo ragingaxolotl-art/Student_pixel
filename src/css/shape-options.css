@@ -1,0 +1,102 @@
+.shape-options[hidden] {
+  display: none;
+}
+/* Tool hints must not block clicking an adjacent drawing tool. */
+.tooltip {
+  pointer-events: none;
+}
+.shape-options {
+  color: #ddd;
+  font:
+    11px Arial,
+    sans-serif;
+}
+.shape-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.shape-field {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 0;
+  line-height: 13px;
+  font:
+    11px Arial,
+    sans-serif;
+  color: #bbb;
+}
+.shape-field select,
+.shape-field input[type="number"],
+.shape-compact {
+  box-sizing: border-box;
+  height: 19px;
+  margin: 0;
+  padding: 0 3px;
+  border: 1px solid #777;
+  border-radius: 1px;
+  background: #383838;
+  color: #eee;
+  font:
+    11px Arial,
+    sans-serif;
+}
+.shape-field select {
+  width: 110px;
+}
+.shape-color-field .sp-replacer {
+  box-sizing: border-box;
+  width: 48px;
+  height: 19px;
+  padding: 1px 3px;
+  background: #383838;
+  border: 1px solid #777;
+  color: #ddd;
+}
+.shape-color-field .sp-preview {
+  width: 24px;
+  height: 13px;
+  margin-right: 3px;
+}
+.shape-color-field .sp-dd {
+  padding: 0;
+  line-height: 15px;
+}
+.shape-width-field input {
+  width: 46px;
+}
+.shape-field select:focus-visible,
+.shape-field input:focus-visible,
+.shape-field .sp-replacer:focus-visible,
+.shape-compact:focus-visible {
+  outline: 2px solid gold;
+  outline-offset: 1px;
+}
+.shape-field[data-inactive="true"] {
+  opacity: 0.45;
+}
+.shape-compact {
+  display: none;
+  height: 26px;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+@media (max-width: 680px) {
+  .shape-compact {
+    display: block;
+  }
+  .shape-controls {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 8px;
+    padding: 10px;
+    border: 1px solid #777;
+    background: #292929;
+    box-shadow: 0 5px 16px #0008;
+  }
+  .shape-options.controls-open .shape-controls {
+    display: flex;
+  }
+}

@@ -9,6 +9,7 @@ exports.styles = [
   "css/animations.css",
   "css/layout.css",
   "css/dither-options.css",
+  "css/shape-options.css",
   "css/font-icon.css",
   "css/forms.css",
   "css/settings.css",
