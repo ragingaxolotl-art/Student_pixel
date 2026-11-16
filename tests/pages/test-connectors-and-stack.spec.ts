@@ -208,6 +208,7 @@ test("Tester man keeps its exact 14-layer order and rest appearance when binding
           (b: any) => !b.layerId && b.parent === null
         ).id
   );
+  await page.getByRole("tab", { name: "Setup rig", exact: true }).click();
   await page.locator('[name="rig-bone"]').selectOption(bone);
   await page
     .getByLabel("Bound source layer", { exact: true })

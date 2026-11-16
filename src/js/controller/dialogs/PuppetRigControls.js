@@ -316,8 +316,11 @@
       this.drawPuppetExtras(svg, element, sx, sy);
     }
     plan.rig.bones
-      .filter(function () {
-        return plan.options.skeleton;
+      .filter(function (bone) {
+        return (
+          plan.options.skeleton &&
+          (world[bone.id].visible || bone.id === plan.options.bone)
+        );
       })
       .forEach(function (b) {
         var w = world[b.id],

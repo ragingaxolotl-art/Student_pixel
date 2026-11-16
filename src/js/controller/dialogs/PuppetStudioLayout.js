@@ -617,12 +617,15 @@
           this.write("rig", {
             referenceFrame: frame,
             skin: false,
-            editMode: "rest"
+            editMode: p.toolState.rigStudio ? "pose" : "rest",
+            previewAnimation: false
           });
-          await this.savePuppetDraft(
-            setup,
-            setup.bones[0] ? setup.bones[0].id : null
-          );
+          var world = r.world(setup, setup.workingPose),
+            selected =
+              setup.bones.find(function (bone) {
+                return world[bone.id].visible;
+              }) || setup.bones[0];
+          await this.savePuppetDraft(setup, selected ? selected.id : null);
           chooser.remove();
           this.puppetChooser = null;
         } catch (e) {
