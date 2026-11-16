@@ -863,6 +863,13 @@
       return;
     }
     this.updateEffectEditingState();
+    var artBounds = document
+      .querySelector("#animated-preview-canvas-container")
+      .getBoundingClientRect();
+    if (!artBounds.width || !artBounds.height) {
+      this.lastPreviewHash = null;
+      return;
+    }
     var c = this.piskelController,
       o = this.options(),
       frame = c.getCurrentFrame(),
@@ -894,9 +901,6 @@
       var canvas = this.previewWindow.querySelector("canvas");
       canvas.width = result.getWidth();
       canvas.height = result.getHeight();
-      var artBounds = document
-        .querySelector("#animated-preview-canvas-container")
-        .getBoundingClientRect();
       var previewBounds = document
         .querySelector("#animated-preview-container")
         .getBoundingClientRect();
@@ -1247,7 +1251,14 @@
     this.lastPreviewAt = Date.now();
     var c = this.piskelController,
       o = this.options(),
-      other = this.reference(o);
+      other = this.reference(o),
+      bounds = document
+        .querySelector("#animated-preview-canvas-container")
+        .getBoundingClientRect();
+    if (!bounds.width || !bounds.height) {
+      this.lastPreviewHash = null;
+      return;
+    }
     var hash =
       pskl.utils.LayerUtils.getFrameHashAt(
         c.getLayers(),
@@ -1260,7 +1271,9 @@
       ":" +
       c.getCurrentLayerIndex() +
       ":" +
-      c.getCurrentFrameIndex();
+      c.getCurrentFrameIndex() +
+      ":" +
+      JSON.stringify([bounds.x, bounds.y, bounds.width, bounds.height]);
     if (hash !== this.lastPreviewHash) {
       this.lastPreviewHash = hash;
       this.preview();

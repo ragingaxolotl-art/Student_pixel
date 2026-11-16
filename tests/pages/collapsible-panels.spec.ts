@@ -44,6 +44,8 @@ test('collapsed preview hides its tabs and preserves an unfinished effect; openi
  await openEditor(page);await page.locator('.layer-fx').first().click();await page.getByLabel('Effect',{exact:true}).selectOption('invert');
  const settings=await page.evaluate(()=>window.pskl.app.layersListController.options());
  await toggle(page,'Preview');await expect(page.locator('.layer-preview-tabs')).toBeHidden();await expect(page.locator('[data-workspace-resize="previewHeight"]')).toBeHidden();
+ // Keep editing while Preview is collapsed: a hidden preview must not cache a zero-sized result.
+ await page.getByLabel('Effect',{exact:true}).selectOption('grayscale');await page.getByLabel('Effect',{exact:true}).selectOption('invert');
  await toggle(page,'Preview',false);await expect(page.locator('.layer-preview-tabs')).toBeVisible();await expect(page.locator('.layer-result-preview canvas')).toBeVisible();
  expect(await page.evaluate(()=>window.pskl.app.layersListController.options())).toEqual(settings);
  await toggle(page,'Layer options');await page.locator('.layer-fx').first().click();

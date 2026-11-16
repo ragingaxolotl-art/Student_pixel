@@ -120,8 +120,21 @@ async function state(page: any) {
   });
 }
 async function point(page: any, x: number, y: number) {
-  const c = (await page.locator('[data-art-preview="after"]').boundingBox())!;
+  const canvas = page.locator('[data-art-preview="after"]');
+  await canvas.hover();
+  const c = (await canvas.boundingBox())!;
   return { x: c.x + (x * c.width) / 32, y: c.y + (y * c.height) / 32 };
+}
+async function renderedPoses(page: any) {
+  return page.evaluate(() => {
+    const s = window.pskl,
+      p = s.app.piskelController.getPiskel(),
+      rig = p.toolState.rigStudio;
+    const renderer = new s.utils.RigStudioRenderer(p, rig);
+    return [rig.workingPose, ...rig.poses.map((pose: any) => pose.values)].map(
+      (pose) => renderer.scene(pose, 0).toDataURL()
+    );
+  });
 }
 async function clickArt(page: any) {
   const p = await point(page, 9, 11);
@@ -136,7 +149,10 @@ async function drag(
   dy: number,
   cancel = false
 ) {
-  const b = (await page.locator(selector).boundingBox())!;
+  const handle = page.locator(selector);
+  await expect(handle).toBeVisible();
+  await handle.hover();
+  const b = (await handle.boundingBox())!;
   await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
   await page.mouse.down();
   await page.mouse.move(b.x + b.width / 2 + dx, b.y + b.height / 2 + dy, {
@@ -200,6 +216,7 @@ test("disconnect preserves rotated current and saved poses; undo, redo and proje
     .getByRole("button", { name: "Select bone Arm", exact: true })
     .click();
   const before = await state(page);
+  const renderedBefore = await renderedPoses(page);
   await page
     .getByRole("button", { name: "Disconnect selected joint", exact: true })
     .click();
@@ -213,6 +230,7 @@ test("disconnect preserves rotated current and saved poses; undo, redo and proje
   matricesSame(before.world, after.world);
   before.poses.forEach((w: any, i: number) => matricesSame(w, after.poses[i]));
   expect(after.layers).toEqual(before.layers);
+  expect(await renderedPoses(page)).toEqual(renderedBefore);
   await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect
     .poll(
