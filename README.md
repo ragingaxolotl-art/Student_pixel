@@ -12,6 +12,14 @@ Select **Rectangle** or **Ellipse** for title-bar fill and color options. **Empt
 
 The existing Dither tool opens compact Pattern, Density, Scale and Colors controls beside the project title. Move Density to override the selected pattern with adjustable ordered dithering from 0–100%; its gold label shows when active. Choosing a pattern returns to pattern mode. Its scrollable picker contains 273 separate visual patterns and density steps. The thumbnail and brush share the same sampler at 1, 2 and 4 pixel scales.
 
+Use the **pen** and **bucket** icons beside those controls to brush a dither or fill one connected region. **Gradient** opens a movable panel with a live sample, eight directions, 2/4/8 dither matrices, and two to eight editable color stops with individual opacity. Gradient fills fit the clicked region's bounds; right-click reverses them. Picking a pattern or adjusting Density switches back to patterned fills. Undo restores an entire bucket fill in one step, and Redo keeps its original settings.
+
+Click the **star** beside Pattern to add or remove that pattern from **Favorites**. The separate Favorites dropdown recalls saved patterns and switches back from Density or Gradient mode. Favorite patterns save in this browser.
+
+Brush size presets, an exact pixel size, and **Paint opacity** now appear at the top for painting tools. Narrow windows use compact option menus. Size, opacity, dither mode, gradient settings, and panel placement save in this browser. Paint opacity also works when painting masks.
+
+FX supports **Effect only (hide source artwork)** for color blends, soft **Feather** edges, and painted opacity masks on layers and nested groups. Source paint can affect only the target below without showing its own overhang. See [FX and masks](FX-MASKS.md) for painting, toggling, and editing these effects.
+
 Puppet Studio supports manually mapped layered characters, custom joints, pose markers, walking guides, editable joint motion paths, and locks saved independently with each pose. Shoulder/pelvis connectors carry attached limbs with the body while allowing independent bending. Add joints inside solid segments, or explicitly split a segment with hinge or flexible bending. Clear joints starts over without changing artwork. The source layer stack controls artwork order, independently of the skeleton. Lock/unlock records the current marker; different markers that shared a pose stay independent. See [the studio guide](PUPPET-STUDIO.md).
 
 Drawings can be saved in the browser or downloaded as `.piskel` files. Browser saves belong to that browser/device. Moving artwork from the desktop test editor requires exporting and importing its `.piskel` file.

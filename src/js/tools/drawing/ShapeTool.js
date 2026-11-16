@@ -27,7 +27,13 @@
       mode: ["solid", "fill-only"].includes(this.shapeMode)
         ? this.shapeMode
         : "empty",
-      fillColor: this.fillColor === null ? this.getToolColor() : this.fillColor
+      fillColor:
+        this.fillColor === null
+          ? this.getToolColor()
+          : pskl.utils.DitherPaintUtils.opacity(
+              this.fillColor,
+              pskl.UserSettings.get(pskl.UserSettings.BRUSH_OPACITY)
+            )
     };
   };
 

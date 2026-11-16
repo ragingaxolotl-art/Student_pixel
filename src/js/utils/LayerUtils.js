@@ -38,6 +38,7 @@
         hashBuffer.push(
           l.getOpacity(),
           !!l.rowState.hidden,
+          !!l.rowState.effectOnly,
           JSON.stringify(l.rowState.effects || [])
         );
         return frame;
@@ -58,6 +59,7 @@
       var isTransparent = layers.some(function (l) {
         return (
           l.isTransparent() ||
+          pskl.utils.LayerEffects.needsAdvanced(layers) ||
           pskl.utils.LayerEffects.list(l).length > 0 ||
           l.getFrameAt(index).pixels.some(function (pixel) {
             var alpha = pixel >>> 24;
@@ -110,6 +112,15 @@
 
     flattenFrameAt: function (layers, index, preserveOpacity, context, sample) {
       context = context || layers;
+      if (pskl.utils.LayerEffects.needsAdvanced(context)) {
+        return pskl.utils.LayerEffects.renderAdvanced(
+          layers,
+          index,
+          preserveOpacity,
+          context,
+          sample
+        );
+      }
       sample = sample || layers[0].getFrameAt(index);
       var width = sample.getWidth(),
         height = sample.getHeight(),

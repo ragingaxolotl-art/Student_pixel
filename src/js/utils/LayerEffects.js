@@ -28,21 +28,20 @@
         })
         .pop();
     },
-    frame: function (layer, index, layers) {
+    frame: function (layer, index, layers, source) {
       var effects = this.enabled(layer, index).filter(function (e) {
         return !ns.LayerBlendUtils.isBlend(e.operation);
       });
-      var source = layer.getFrameAt(index);
+      source = source || layer.getFrameAt(index);
       if (!effects.length) {
         return source;
       }
-      var position = layers.indexOf(layer),
+      var self = this,
         key = source.getHash() + JSON.stringify(effects);
       effects.forEach(function (e) {
-        var other =
-          layers[position + (e.params.direction === "above" ? 1 : -1)];
+        var other = self.referenceLayer(layer, e.params, layers);
         if (other) {
-          key += other.getFrameAt(index).getHash();
+          key += other.getFrameAt(index).getHash() + ":" + other.getOpacity();
         }
       });
       if (layer._effectCache && layer._effectCache.key === key) {
@@ -51,10 +50,11 @@
       var output = source;
       effects.forEach(function (e) {
         var o = e.params,
-          other = layers[position + (o.direction === "above" ? 1 : -1)],
+          other = self.referenceLayer(layer, o, layers),
           ref = other && other.getFrameAt(index);
         if (e.operation === "mask" || e.operation === "maskInverse") {
           if (ref) {
+            ref = self.maskFrame(other, index, o);
             output = ns.LayerPixelOps.manipulate(
               output,
               ref,
@@ -143,9 +143,10 @@
         var a = lower.rowState.hidden
             ? 0
             : ((p.pixels[i] >>> 24) / 255) * lower.getOpacity(),
-          s = upper.rowState.hidden
-            ? 0
-            : ((q.pixels[i] >>> 24) / 255) * upper.getOpacity(),
+          s =
+            upper.rowState.hidden || upper.rowState.effectOnly
+              ? 0
+              : ((q.pixels[i] >>> 24) / 255) * upper.getOpacity(),
           alpha = a + s * (1 - a);
         if (!alpha) {
           continue;

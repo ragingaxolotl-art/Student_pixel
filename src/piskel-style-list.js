@@ -10,6 +10,7 @@ exports.styles = [
   "css/layout.css",
   "css/dither-options.css",
   "css/shape-options.css",
+  "css/paint-options.css",
   "css/font-icon.css",
   "css/forms.css",
   "css/settings.css",

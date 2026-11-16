@@ -46,7 +46,18 @@
       hash.apply(this, arguments) +
       JSON.stringify(
         context.map(function (l) {
-          return [g.state(l).parentGroup, g.state(l).hidden, l.getOpacity()];
+          return [
+            g.state(l).parentGroup,
+            g.state(l).hidden,
+            l.getOpacity(),
+            pskl.utils.LayerEffects.needsAdvanced(context)
+              ? [
+                  l.getFrameAt(index).getHash(),
+                  l.rowState.effects,
+                  l.rowState.effectOnly
+                ]
+              : null
+          ];
         })
       )
     );
@@ -76,6 +87,9 @@
   };
   u.flattenFrameAt = function (layers, index, preserve, context, sample) {
     context = g.context(context || layers);
+    if (pskl.utils.LayerEffects.needsAdvanced(context)) {
+      return flatten.call(this, layers, index, preserve, context, sample);
+    }
     if (
       !context.some(function (l) {
         return !!g.state(l).parentGroup;

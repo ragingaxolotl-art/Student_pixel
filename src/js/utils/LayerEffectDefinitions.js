@@ -14,13 +14,14 @@
   ns.LayerEffectDefinitions = {
     parameters: function (effect) {
       if (ns.LayerBlendUtils.isBlend(effect)) {
-        return [strength];
+        return [strength, param("feather", "Feather (pixels)", 0, 0, 32)];
       }
       switch (effect) {
         case "none":
+          return [];
         case "mask":
         case "maskInverse":
-          return [];
+          return [param("feather", "Feather (pixels)", 0, 0, 32)];
         case "outline":
         case "innerOutline":
           return [param("amount", "Width (pixels)", 1, 1, 16)];

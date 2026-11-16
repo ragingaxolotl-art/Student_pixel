@@ -7,6 +7,7 @@
     transform: "Transform",
     palettes: "Palettes",
     studios: "Studios",
+    gradient: "Dither gradient",
     options: "Layer options",
     frames: "Frames",
     layers: "Layers"
@@ -48,6 +49,7 @@
       transform: document.querySelector(".transformations-container"),
       palettes: document.querySelector(".palettes-list-container"),
       studios: document.querySelector(".studio-panel"),
+      gradient: document.querySelector("#dither-gradient-panel"),
       frames: document.querySelector(".frames-column"),
       layers: document.querySelector(".layers-column")
     };

@@ -10,7 +10,7 @@ describe("Workspace layout", function () {
     var next = layout.move(original, "palettes", "left");
     next = layout.move(next, "transform", "left", "palettes");
     expect(next.left).toEqual(["transform", "palettes"]);
-    expect(next.right).toEqual(["studios", "options"]);
+    expect(next.right).toEqual(["studios", "options", "gradient"]);
     expect(original).toEqual(layout.defaults());
   });
   it("keeps wide rows out of sidebars and the preview out of horizontal rows", function () {
@@ -22,7 +22,7 @@ describe("Workspace layout", function () {
   it("repairs duplicates, wrong positions and missing panels", function () {
     var state = layout.normalize({version:1, tools:"top", preview:"left", left:["palettes","layers","palettes"], right:["palettes","unknown"], top:["layers"]});
     expect(state.left).toEqual(["palettes", "studios"]);
-    expect(state.right).toEqual(["transform", "options"]);
+    expect(state.right).toEqual(["transform", "options", "gradient"]);
     expect(state.top).toEqual(["layers"]);
     expect(state.bottom).toEqual(["frames"]);
     expect(state.tools).toBe("left");
@@ -37,7 +37,7 @@ describe("Workspace layout", function () {
     expect(state.tools).toBe("right");
     expect(state.preview).toBe("left");
     expect(state.left).toEqual(["transform"]);
-    expect(state.right).toEqual(["palettes","studios","options"]);
+    expect(state.right).toEqual(["palettes","studios","options","gradient"]);
     expect(state.top).toEqual(["layers"]);
     expect(state.bottom).toEqual(["frames"]);
   });

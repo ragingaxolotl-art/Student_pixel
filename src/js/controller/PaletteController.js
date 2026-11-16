@@ -34,12 +34,9 @@
       showPalette: true,
       showButtons: false,
       showInput: true,
+      showAlpha: true,
       palette: [["rgba(0,0,0,0)"]],
-      clickoutFiresChange: true,
-
-      beforeShow: function (tinycolor) {
-        tinycolor.setAlpha(1);
-      }
+      clickoutFiresChange: true
     };
 
     // Initialize colorpickers:
@@ -72,12 +69,19 @@
    */
   ns.PaletteController.prototype.onPickerChange_ = function (evt) {
     var inputPicker = evt.target;
-    var color = inputPicker.value;
+    // The input's preferred hex format omits alpha; Spectrum's current color
+    // retains the opacity selected in its slider or RGBA field.
+    var selected = $(inputPicker).spectrum("get");
+    var color = selected ? selected.toRgbString() : inputPicker.value;
 
     if (color != Constants.TRANSPARENT_COLOR) {
-      // Unless the color is TRANSPARENT_COLOR, format it to hexstring, as
-      // expected by the rest of the application.
-      color = window.tinycolor(color).toHexString();
+      var parsed = window.tinycolor(color);
+      color =
+        parsed.getAlpha() === 0
+          ? Constants.TRANSPARENT_COLOR
+          : parsed.getAlpha() < 1
+            ? parsed.toRgbString()
+            : parsed.toHexString();
     }
 
     if (evt.data.isPrimary) {

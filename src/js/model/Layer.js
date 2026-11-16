@@ -70,7 +70,19 @@
   };
 
   ns.Layer.prototype.isTransparent = function () {
-    return this.opacity < 1 || !!this.rowState.hidden;
+    return (
+      this.opacity < 1 ||
+      !!this.rowState.hidden ||
+      !!this.rowState.effectOnly ||
+      pskl.utils.LayerEffects.list(this).some(function (e) {
+        return (
+          e.enabled !== false &&
+          (e.operation === "mask" ||
+            e.operation === "maskInverse" ||
+            Number(e.params.feather) > 0)
+        );
+      })
+    );
   };
 
   ns.Layer.prototype.getFrames = function () {

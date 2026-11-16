@@ -1,0 +1,55 @@
+<section
+  id="dither-gradient-panel"
+  class="toolbox-container"
+  hidden
+  aria-label="Dither gradient settings"
+>
+  <h3 class="toolbox-title">Dither gradient</h3>
+  <div class="dither-gradient-body">
+    <canvas
+      class="dither-gradient-preview"
+      width="160"
+      height="32"
+      aria-label="Dither gradient preview"
+    ></canvas>
+    <label
+      >Direction<select
+        aria-label="Gradient direction"
+        data-gradient-field="angle"
+      >
+        <option value="0">Left → right</option>
+        <option value="180">Right → left</option>
+        <option value="90">Top → bottom</option>
+        <option value="270">Bottom → top</option>
+        <option value="45">Top left → bottom right</option>
+        <option value="135">Top right → bottom left</option>
+        <option value="225">Bottom right → top left</option>
+        <option value="315">Bottom left → top right</option>
+      </select></label
+    >
+    <label
+      >Dither matrix<select
+        aria-label="Gradient dither matrix"
+        data-gradient-field="matrix"
+      >
+        <option value="2">2 × 2</option>
+        <option value="4">4 × 4</option>
+        <option value="8">8 × 8</option>
+      </select></label
+    >
+    <div class="dither-gradient-stops" aria-label="Gradient color stops"></div>
+    <div class="gradient-actions">
+      <button type="button" data-gradient-action="add">+ Color stop</button
+      ><button type="button" data-gradient-action="colors">
+        Use current colors
+      </button><button type="button" data-gradient-action="close">
+        Close settings
+      </button>
+    </div>
+    <p>
+      Bucket fills the connected color region. Its bounds set the gradient
+      direction. Color-stop opacity also works for painted masks. Right-click
+      reverses the gradient.
+    </p>
+  </div>
+</section>

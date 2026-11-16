@@ -1,6 +1,6 @@
 (function () {
   var ns = $.namespace("pskl.utils");
-  var sides = ["transform", "palettes", "studios", "options"];
+  var sides = ["transform", "palettes", "studios", "options", "gradient"];
   var rows = ["frames", "layers"];
   var zones = ["left", "right", "top", "bottom"];
   var defaults = function () {

@@ -1,0 +1,38 @@
+<div id="brush-options" class="brush-options" aria-label="Brush options" hidden>
+  <button
+    type="button"
+    class="brush-compact"
+    aria-expanded="false"
+    aria-controls="brush-controls"
+  >
+    Brush options ▾
+  </button>
+  <div id="brush-controls" class="brush-controls">
+    <div class="brush-size-group">
+      <span>Brush size</span>
+      <div class="brush-size-row">
+        <div class="brush-presets"></div>
+        <input
+          type="number"
+          min="1"
+          max="32"
+          step="1"
+          aria-label="Brush size (pixels)"
+        >
+      </div>
+    </div>
+    <label class="brush-opacity-group"
+      >Paint opacity
+      <div class="brush-opacity-row">
+        <input
+          type="range"
+          min="0"
+          max="100"
+          step="1"
+          value="100"
+          aria-label="Brush opacity"
+        ><output>100%</output>
+      </div></label
+    >
+  </div>
+</div>

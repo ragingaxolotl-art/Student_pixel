@@ -462,6 +462,7 @@
       old = {};
     } else if (this.pendingLayer !== layer) {
       old.opacity = Math.round(layer.getOpacity() * 100);
+      old.effectOnly = !!layer.rowState.effectOnly;
     }
     if (this.loadEffectSettings) {
       var selectedEffect = pskl.utils.LayerEffects.list(layer).find(
@@ -580,6 +581,40 @@
         "below"
       );
     }
+    if (
+      this.panelKind === "fx" &&
+      (operation === "mask" || operation === "maskInverse")
+    ) {
+      var sources = { "": "Use above / below" };
+      c.getLayers().forEach(function (candidate) {
+        if (
+          candidate !== layer &&
+          !pskl.utils.LayerGroupUtils.isGroup(candidate)
+        ) {
+          sources[pskl.utils.LayerGroupUtils.id(candidate)] =
+            candidate.getName();
+        }
+      });
+      field("Mask layer", "select", "maskId", sources, "");
+      field(
+        "Hide mask artwork",
+        "checkbox",
+        "hideMask",
+        null,
+        !this.editingEffectId
+      );
+      var paint = el("button", "", "Create & paint mask");
+      paint.disabled = layer.isLocked();
+      paint.onclick = this.createPaintMask.bind(this);
+      pane.append(paint);
+      pane.append(
+        el(
+          "p",
+          "",
+          "Paint opacity reveals artwork: opaque paint shows it fully, partial opacity shows it partly, and erasing hides it. Masks work on layers and whole groups. Create & paint mask applies a new empty mask and selects it for drawing."
+        )
+      );
+    }
     if (this.panelKind === "fx") {
       definitions.parameters(operation).forEach(function (parameter) {
         var input = field(
@@ -603,11 +638,18 @@
         );
       }
       if (pskl.utils.LayerBlendUtils.isBlend(operation)) {
+        field(
+          "Effect only (hide source artwork)",
+          "checkbox",
+          "effectOnly",
+          null,
+          !!layer.rowState.effectOnly
+        );
         pane.append(
           el(
             "p",
             "",
-            "Editable layer blend: combines with all visible artwork below. Only one color blend is active per layer."
+            "Effect only changes the layer or group directly below, within its visible pixels. The source stays editable but its artwork is hidden. Leave it off for a normal blend with all visible artwork below. Feather softens the edge; 0 keeps exact pixels."
           )
         );
       } else if (
@@ -659,6 +701,13 @@
             return entry.id !== this.editingEffectId;
           }.bind(this)
         );
+        if (
+          !layer.rowState.effects.some(function (entry) {
+            return pskl.utils.LayerBlendUtils.isBlend(entry.operation);
+          })
+        ) {
+          layer.rowState.effectOnly = false;
+        }
         this.commit();
         this.closePreview();
       }.bind(this);
@@ -718,6 +767,23 @@
   };
   proto.reference = function (o) {
     var c = this.piskelController;
+    if (
+      this.panelKind === "fx" &&
+      pskl.utils.LayerBlendUtils.isBlend(o.operation) &&
+      o.effectOnly
+    ) {
+      return pskl.utils.LayerEffects.targetBelow(
+        c.getCurrentLayer(),
+        c.getLayers()
+      );
+    }
+    if (this.panelKind === "fx") {
+      return pskl.utils.LayerEffects.referenceLayer(
+        c.getCurrentLayer(),
+        o,
+        c.getLayers()
+      );
+    }
     return c.getLayers()[
       c.getCurrentLayerIndex() + (o.direction === "above" ? 1 : -1)
     ];
@@ -726,7 +792,10 @@
     return (
       this.panelKind === "subtract" ||
       o.operation === "mask" ||
-      o.operation === "maskInverse"
+      o.operation === "maskInverse" ||
+      (this.panelKind === "fx" &&
+        pskl.utils.LayerBlendUtils.isBlend(o.operation) &&
+        o.effectOnly)
     );
   };
   proto.updateEffectEditingState = function () {
@@ -788,9 +857,13 @@
     try {
       if (this.needsReference(o) && !other) {
         throw new Error(
-          "No layer " +
-            o.direction +
-            ". Choose the other direction or add a layer."
+          this.panelKind === "fx"
+            ? o.effectOnly
+              ? "Place this source above the layer or group you want to affect."
+              : "Choose a mask layer, or use Create & paint mask."
+            : "No layer " +
+                o.direction +
+                ". Choose the other direction or add a layer."
         );
       }
       if (this.panelKind === "fx") {
@@ -837,6 +910,9 @@
                   );
           } else if (index === c.getCurrentLayerIndex()) {
             if (this.panelKind === "fx") {
+              if (pskl.utils.LayerBlendUtils.isBlend(o.operation)) {
+                view.rowState.effectOnly = !!o.effectOnly;
+              }
               view.rowState.effects = pskl.utils.LayerEffects.proposed(
                 layer,
                 o,
@@ -916,6 +992,9 @@
       }
       if (this.panelKind === "fx") {
         pskl.utils.LayerEffectDefinitions.validate(o.operation, o);
+        if (pskl.utils.LayerBlendUtils.isBlend(o.operation)) {
+          layer.rowState.effectOnly = !!o.effectOnly;
+        }
         layer.rowState.effects = pskl.utils.LayerEffects.proposed(
           layer,
           o,
@@ -997,6 +1076,47 @@
     this.requestedPreviewMode = "fx";
     this.refreshPane();
     this.revealPane_();
+  };
+  proto.createPaintMask = function () {
+    var c = this.piskelController,
+      target = c.getCurrentLayer(),
+      project = c.getPiskel(),
+      o = this.options();
+    if (target.isLocked()) {
+      return;
+    }
+    try {
+      pskl.utils.LayerEffectDefinitions.validate(o.operation, o);
+      var mask = pskl.model.Layer.fromFrames(
+        target.getName() + " · mask",
+        target.getFrames().map(function (frame) {
+          return pskl.model.Frame.createEmptyFromFrame(frame);
+        })
+      );
+      // hideMask suppresses its artwork in the composite. Keep the source
+      // layer itself enabled so the normal drawing tools can paint it.
+      var isGroup = pskl.utils.LayerGroupUtils.isGroup(target);
+      mask.rowState.parentGroup = isGroup
+        ? pskl.utils.LayerGroupUtils.id(target)
+        : target.rowState.parentGroup || null;
+      o.maskId = pskl.utils.LayerGroupUtils.id(mask);
+      o.direction = "above";
+      o.hideMask = true;
+      project.addLayerAt(mask, c.getCurrentLayerIndex() + (isGroup ? 0 : 1));
+      target.rowState.effects = pskl.utils.LayerEffects.proposed(
+        target,
+        o,
+        this.editingEffectId,
+        c.getCurrentFrameIndex()
+      );
+      target.setOpacity(Number(o.opacity) / 100);
+      c.setCurrentLayerIndex(c.getLayers().indexOf(mask));
+      this.commit();
+      this.closePreview();
+      $.publish(Events.SELECT_TOOL, ["tool-pen"]);
+    } catch (error) {
+      this.pane.querySelector(".layer-error").textContent = error.message;
+    }
   };
   proto.closePreview = function () {
     this.panelKind = null;

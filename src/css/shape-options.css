@@ -82,7 +82,7 @@
   padding: 3px 6px;
   cursor: pointer;
 }
-@media (max-width: 680px) {
+@media (max-width: 900px) {
   .shape-compact {
     display: block;
   }
@@ -95,6 +95,10 @@
     border: 1px solid #777;
     background: #292929;
     box-shadow: 0 5px 16px #0008;
+    z-index: 1200;
+    max-width: calc(100vw - 16px);
+    box-sizing: border-box;
+    flex-wrap: wrap;
   }
   .shape-options.controls-open .shape-controls {
     display: flex;

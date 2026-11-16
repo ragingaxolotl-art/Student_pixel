@@ -214,6 +214,9 @@
       this.ditherOptionsController =
         new pskl.controller.DitherOptionsController();
       this.ditherOptionsController.init();
+      this.brushOptionsController =
+        new pskl.controller.BrushOptionsController();
+      this.brushOptionsController.init();
 
       this.shapeOptionsController =
         new pskl.controller.ShapeOptionsController();

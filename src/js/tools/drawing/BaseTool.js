@@ -37,9 +37,15 @@
 
   ns.BaseTool.prototype.getToolColor = function () {
     if (pskl.app.mouseStateService.isRightButtonPressed()) {
-      return pskl.app.selectedColorsService.getSecondaryColor();
+      return pskl.utils.DitherPaintUtils.opacity(
+        pskl.app.selectedColorsService.getSecondaryColor(),
+        pskl.UserSettings.get(pskl.UserSettings.BRUSH_OPACITY)
+      );
     }
-    return pskl.app.selectedColorsService.getPrimaryColor();
+    return pskl.utils.DitherPaintUtils.opacity(
+      pskl.app.selectedColorsService.getPrimaryColor(),
+      pskl.UserSettings.get(pskl.UserSettings.BRUSH_OPACITY)
+    );
   };
 
   ns.BaseTool.prototype.moveUnactiveToolAt = function (

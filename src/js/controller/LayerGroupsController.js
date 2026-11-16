@@ -156,7 +156,7 @@
                 groups.state(l).parentGroup || null;
             });
         }
-        if (action === "merge" || action === "fx" || action === "subtract") {
+        if (action === "merge" || action === "subtract") {
           e.preventDefault();
           e.stopImmediatePropagation();
         }

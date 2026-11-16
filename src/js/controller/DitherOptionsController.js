@@ -6,12 +6,19 @@
     this.root = document.querySelector("#dither-options");
     this.menu = this.root.querySelector(".dither-pattern-menu");
     this.trigger = this.root.querySelector(".dither-pattern-trigger");
-    this.settings = patterns.normalize(
+    this.favoriteSelect = this.root.querySelector(
+      '[aria-label="Dither favorites"]'
+    );
+    this.favoriteToggle = this.root.querySelector(".dither-favorite-toggle");
+    this.patternIds = new Set(patterns.list().map((entry) => entry.id));
+    this.settings = pskl.utils.DitherPaintUtils.settings(
       pskl.UserSettings.get(pskl.UserSettings.DITHER_SETTINGS)
     );
   };
 
   ns.DitherOptionsController.prototype.init = function () {
+    this.gradientController = new ns.DitherGradientController(this);
+    this.gradientController.init();
     patterns.list().forEach((entry) => {
       const button = document.createElement("button"),
         canvas = document.createElement("canvas"),
@@ -31,15 +38,32 @@
     });
     this.root.addEventListener("click", (event) => {
       const choice = event.target.closest("[data-dither-pattern]");
-      if (choice) {
+      const paint = event.target.closest("[data-dither-paint]");
+      if (event.target.closest(".dither-favorite-toggle")) {
+        const favorites = this.favorites_(),
+          id = this.settings.pattern,
+          added = !favorites.includes(id);
+        pskl.UserSettings.set(
+          pskl.UserSettings.DITHER_FAVORITES,
+          added ? favorites.concat(id) : favorites.filter((f) => f !== id)
+        );
+        this.root.querySelector(".dither-announcement").textContent =
+          patterns.get(id).label +
+          (added ? " added to favorites" : " removed from favorites");
+      } else if (paint) {
+        this.settings.paint = paint.dataset.ditherPaint;
+        this.save_();
+      } else if (choice) {
         this.settings.pattern = choice.dataset.ditherPattern;
         this.settings.mode = "pattern";
+        this.settings.fill = "pattern";
         this.save_();
         this.close_();
         this.trigger.focus({ preventScroll: true });
         this.root.querySelector(".dither-announcement").textContent =
           patterns.get(this.settings.pattern).label;
       } else if (event.target.closest(".dither-density-mode")) {
+        this.settings.fill = "pattern";
         this.settings.mode =
           this.settings.mode === "density" ? "pattern" : "density";
         this.save_();
@@ -62,11 +86,23 @@
       if (event.target.dataset.ditherSetting === "density") {
         this.settings.density = Number(event.target.value);
         this.settings.mode = "density";
+        this.settings.fill = "pattern";
         this.close_();
         this.save_();
       }
     });
     this.root.addEventListener("change", (event) => {
+      if (
+        event.target === this.favoriteSelect &&
+        this.patternIds.has(event.target.value)
+      ) {
+        this.settings.pattern = event.target.value;
+        this.settings.mode = "pattern";
+        this.settings.fill = "pattern";
+        this.save_();
+        this.close_();
+        return;
+      }
       const key = event.target.dataset.ditherSetting;
       if (!key || key === "density") {
         return;
@@ -132,7 +168,13 @@
       this.root.hidden = tool.toolId !== "tool-dithering";
       this.collapse_();
       if (!this.root.hidden) {
+        if (this.settings.fill === "gradient") {
+          this.gradientController.open = true;
+        }
         this.render_();
+        this.gradientController.reveal();
+      } else {
+        this.gradientController.render();
       }
     });
     $.subscribe(Events.DIALOG_SHOW, () => this.collapse_());
@@ -141,8 +183,12 @@
     );
     $.subscribe(Events.USER_SETTINGS_CHANGED, (event, key) => {
       if (key === pskl.UserSettings.DITHER_SETTINGS) {
-        this.settings = patterns.normalize(pskl.UserSettings.get(key));
+        this.settings = pskl.utils.DitherPaintUtils.settings(
+          pskl.UserSettings.get(key)
+        );
         this.render_();
+      } else if (key === pskl.UserSettings.DITHER_FAVORITES) {
+        this.renderFavorites_();
       }
     });
     this.root.hidden =
@@ -150,8 +196,59 @@
     this.render_();
   };
 
+  ns.DitherOptionsController.prototype.favorites_ = function () {
+    const value = pskl.UserSettings.get(pskl.UserSettings.DITHER_FAVORITES);
+    return Array.isArray(value)
+      ? [...new Set(value.filter((id) => this.patternIds.has(id)))]
+      : [];
+  };
+  ns.DitherOptionsController.prototype.renderFavorites_ = function () {
+    const favorites = this.favorites_(),
+      favorite = favorites.includes(this.settings.pattern),
+      key = favorites.join("|");
+    if (this.favoritesKey !== key) {
+      this.favoriteSelect.replaceChildren();
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = favorites.length
+        ? "Choose favorite"
+        : "No favorites yet";
+      placeholder.disabled = true;
+      this.favoriteSelect.append(placeholder);
+      favorites.forEach((id) => {
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = patterns.get(id).label;
+        this.favoriteSelect.append(option);
+      });
+      this.favoritesKey = key;
+    }
+    this.favoriteSelect.disabled = !favorites.length;
+    this.favoriteSelect.value =
+      favorite &&
+      this.settings.mode === "pattern" &&
+      this.settings.fill === "pattern"
+        ? this.settings.pattern
+        : "";
+    this.favoriteSelect.title = favorites.length
+      ? "Choose a saved dither pattern"
+      : "Star a pattern to add it here";
+    this.favoriteToggle.textContent = favorite ? "★" : "☆";
+    this.favoriteToggle.setAttribute("aria-pressed", String(favorite));
+    this.favoriteToggle.setAttribute(
+      "aria-label",
+      (favorite ? "Remove" : "Add") +
+        " current pattern " +
+        (favorite ? "from" : "to") +
+        " favorites"
+    );
+    this.favoriteToggle.title =
+      (favorite ? "Unfavorite " : "Favorite ") +
+      patterns.get(this.settings.pattern).label;
+  };
+
   ns.DitherOptionsController.prototype.save_ = function () {
-    this.settings = patterns.normalize(this.settings);
+    this.settings = pskl.utils.DitherPaintUtils.settings(this.settings);
     pskl.UserSettings.set(pskl.UserSettings.DITHER_SETTINGS, {
       ...this.settings
     });
@@ -216,6 +313,14 @@
     }
   };
   ns.DitherOptionsController.prototype.render_ = function () {
+    this.renderFavorites_();
+    this.root.querySelectorAll("[data-dither-paint]").forEach((button) => {
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.ditherPaint === this.settings.paint)
+      );
+    });
+    this.gradientController.render();
     this.root.querySelectorAll("[data-dither-setting]").forEach((input) => {
       input.value = this.settings[input.dataset.ditherSetting];
     });

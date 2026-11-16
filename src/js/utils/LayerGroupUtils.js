@@ -113,6 +113,11 @@
           parentId = ns.LayerGroupUtils.state(original).parentGroup;
         ns.LayerGroupUtils.state(copy).parentGroup =
           ids.get(parentId) || parentId || null;
+        (copy.rowState.effects || []).forEach(function (effect) {
+          if (effect.params && ids.has(effect.params.maskId)) {
+            effect.params.maskId = ids.get(effect.params.maskId);
+          }
+        });
         if (original !== layer) {
           copy.setName(original.getName());
         }
