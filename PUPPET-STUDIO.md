@@ -4,7 +4,7 @@ This is the active clean editor with frames and layers along the bottom, editabl
 
 ## Open and prepare
 
-Click Puppet Studio under Transform. Bring a character with its body parts already on separate layers. Choose its starting frame in the first dialog. A new rig starts with a custom Character pivot; templates are optional. Your artwork is retained.
+Click the Puppet Studio figure icon in Studios, below Palettes. Bring a character with its body parts already on separate layers. Choose its starting frame in the first dialog. A new rig starts with a custom Character pivot; templates are optional. Your artwork is retained.
 
 The window follows the supplied sketch: Rig/Poses/Clips menus at the top left, template above the canvas, joint tools below the canvas, pose timeline beneath those tools, walking-guide controls at the bottom. The right column keeps preview, hierarchy, scrolling properties, and Save Rig/Generate Frames in separate areas.
 

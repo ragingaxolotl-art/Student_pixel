@@ -1,0 +1,361 @@
+.studio-launchers {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  border-bottom: 1px solid #111;
+}
+.studio-launcher {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 7px;
+  border: 1px solid #666;
+  background: #333;
+  color: #ddd;
+  cursor: pointer;
+}
+.studio-launcher:hover,
+.studio-launcher:focus-visible {
+  color: var(--highlight-color);
+  border-color: var(--highlight-color);
+}
+.studio-launcher svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#dialog-container.particle-studio {
+  position: fixed;
+  width: min(1000px, 95vw);
+  height: min(690px, 94vh);
+  left: 2.5vw;
+  top: 3vh;
+  overflow: hidden;
+  min-width: 0;
+  margin: 0;
+}
+.particle-dialog {
+  display: flex;
+  flex-direction: column;
+  font:
+    12px Arial,
+    sans-serif;
+  background: #292929;
+  color: #eee;
+}
+.particle-dialog * {
+  box-sizing: border-box;
+}
+.particle-dialog button,
+.particle-dialog select,
+.particle-dialog input {
+  font:
+    12px Arial,
+    sans-serif;
+}
+.particle-dialog button {
+  color: #eee;
+  background: #454545;
+  border: 1px solid #666;
+  border-radius: 3px;
+  padding: 5px 7px;
+  cursor: pointer;
+}
+.particle-dialog button:hover {
+  border-color: #ffe600;
+}
+.particle-dialog button[aria-pressed="true"] {
+  background: #615b29;
+  border-color: #ffe600;
+}
+.particle-dialog button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.particle-heading {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 7px 9px;
+  background: #383838;
+  flex: none;
+  cursor: move;
+  touch-action: none;
+}
+.particle-heading strong {
+  font-size: 15px;
+  margin-right: auto;
+}
+.particle-heading span {
+  color: #aaa;
+  font-size: 11px;
+}
+.particle-heading .dialog-close {
+  position: static;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  font-size: 22px;
+  color: #fff;
+}
+.particle-workspace {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 280px;
+  flex: 1;
+  min-height: 0;
+}
+.particle-viewer {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.particle-toolbar,
+.particle-row,
+.particle-playback {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.particle-toolbar {
+  padding: 6px;
+  background: #333;
+  flex: none;
+}
+.particle-toolbar label {
+  margin-left: auto;
+}
+.particle-stage {
+  display: flex;
+  flex: 1;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  background: #202020;
+}
+.particle-image {
+  position: relative;
+  flex: none;
+  line-height: 0;
+  background:
+    repeating-conic-gradient(#414141 0% 25%, #333 0% 50%) 0 0 / 16px 16px;
+}
+.particle-image canvas {
+  display: block;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+.particle-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.particle-overlay [data-point] {
+  pointer-events: auto;
+  cursor: move;
+}
+.particle-hint {
+  padding: 5px 8px;
+  margin: 0;
+  color: #bbb;
+  font-size: 11px;
+  min-height: 26px;
+  line-height: 15px;
+}
+.particle-timeline {
+  padding: 7px;
+  background: #333;
+  border-top: 1px solid #555;
+  flex: none;
+}
+.particle-timeline input[type="range"] {
+  width: 100%;
+  margin: 4px 0;
+}
+.particle-playback span {
+  min-width: 85px;
+}
+.particle-track {
+  height: 22px;
+  position: relative;
+  margin: 7px 8px 0;
+  background: linear-gradient(to right, #555 0 1px, transparent 1px 100%);
+  border-bottom: 2px solid #777;
+}
+.particle-track button {
+  position: absolute;
+  top: 1px;
+  width: 10px;
+  height: 18px;
+  padding: 0;
+  transform: translateX(-50%);
+  background: #ffe600;
+  border: 1px solid #161616;
+}
+.particle-timing {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.particle-timing label {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.particle-timing input {
+  width: 55px;
+}
+.particle-side {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #111;
+  min-height: 0;
+  min-width: 0;
+}
+.particle-layers {
+  padding: 7px;
+  flex: none;
+  background: #333;
+}
+.particle-layers h4 {
+  margin: 0 0 5px;
+  font-size: 12px;
+}
+.particle-artwork,
+.particle-emitter {
+  padding: 5px;
+  border: 1px solid #555;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 3px;
+}
+.particle-artwork {
+  color: #aaa;
+}
+.particle-artwork span {
+  margin-left: auto;
+  font-size: 10px;
+}
+.particle-emitter-list {
+  max-height: 95px;
+  overflow: auto;
+}
+.particle-emitter button {
+  text-align: left;
+  flex: 1;
+  padding: 3px;
+}
+.particle-properties {
+  overflow: auto;
+  min-height: 0;
+  flex: 1;
+  padding: 7px;
+}
+.particle-properties details {
+  border-bottom: 1px solid #555;
+  margin-bottom: 7px;
+  padding-bottom: 6px;
+}
+.particle-properties summary {
+  cursor: pointer;
+  color: #ddd;
+  padding: 5px 0;
+  font-weight: bold;
+}
+.particle-properties label {
+  display: flex;
+  gap: 5px;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0;
+  line-height: 16px;
+}
+.particle-properties input,
+.particle-properties select {
+  width: 105px;
+  min-width: 0;
+  color: #eee;
+  background: #252525;
+  border: 1px solid #666;
+  padding: 3px;
+}
+.particle-properties input[type="checkbox"] {
+  width: auto;
+}
+.particle-properties input[type="color"] {
+  height: 24px;
+}
+.particle-footer {
+  padding: 7px 16px 7px 7px;
+  border-top: 1px solid #555;
+  background: #333;
+  flex: none;
+}
+.particle-footer [role="status"] {
+  margin: 0 0 6px;
+  min-height: 14px;
+  font-size: 11px;
+  line-height: 14px;
+}
+.particle-dialog .particle-generate {
+  color: #161616;
+  background: #ffe600;
+  border-color: #ffe600;
+  font-weight: bold;
+}
+.particle-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: nwse-resize !important;
+  padding: 0 !important;
+  width: 16px;
+  height: 16px;
+  touch-action: none;
+}
+@media (max-width: 800px) {
+  .particle-workspace {
+    grid-template-columns: minmax(160px, 1fr) 240px;
+  }
+  .particle-heading span {
+    display: none;
+  }
+  .particle-properties input,
+  .particle-properties select {
+    width: 92px;
+  }
+}
+
+.particle-emission-range {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: #7bbd7333;
+  pointer-events: none;
+  min-width: 2px;
+}
+.particle-playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid #fff;
+  pointer-events: none;
+}
+.particle-emitter button {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

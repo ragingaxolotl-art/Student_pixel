@@ -42,6 +42,7 @@
         <div class="right-panels-scroller" aria-label="Tool panels">
           @@include('templates/transformations.html', {})
           @@include('templates/palettes-list.html', {})
+          @@include('templates/studio-launchers.html', {})
           <section id="layer-options" class="toolbox-container layer-options" hidden aria-label="Layer options"></section>
         </div>
         <div class="cursor-coordinates" data-test-id="cursor-coordinates"></div>
@@ -81,6 +82,7 @@
 
   <!-- dialogs partials -->
   @@include('templates/dialogs/puppet-studio.html', {})
+  @@include('templates/dialogs/particle-studio.html', {})
   @@include('templates/dialogs/browse-backups.html', {})
   @@include('templates/dialogs/browse-local.html', {})
   @@include('templates/dialogs/cheatsheet.html', {})

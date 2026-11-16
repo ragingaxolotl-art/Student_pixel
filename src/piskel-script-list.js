@@ -183,6 +183,12 @@ exports.scripts = [
   "js/controller/dialogs/JointMotionPathController.js",
   "js/service/PuppetRigService.js",
   "js/controller/dialogs/PuppetStudioDialogController.js",
+  "js/utils/ParticleStudioMath.js",
+  "js/utils/ParticleStudioUtils.js",
+  "js/utils/ParticleStudioDefinition.js",
+  "js/service/ParticleStudioService.js",
+  "js/controller/dialogs/ParticleStudioDialogController.js",
+  "js/controller/dialogs/ParticleStudioInteraction.js",
   "js/controller/dialogs/DialogsController.js",
 
   // Widgets

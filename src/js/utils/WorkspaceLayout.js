@@ -1,6 +1,6 @@
 (function () {
   var ns = $.namespace("pskl.utils");
-  var sides = ["transform", "palettes", "options"];
+  var sides = ["transform", "palettes", "studios", "options"];
   var rows = ["frames", "layers"];
   var zones = ["left", "right", "top", "bottom"];
   var defaults = function () {
@@ -43,7 +43,14 @@
     });
     sides.concat(rows).forEach(function (id) {
       if (seen.indexOf(id) === -1) {
-        result[sides.indexOf(id) !== -1 ? "right" : "bottom"].push(id);
+        if (id === "studios") {
+          // Older saved workspaces predate the Studios panel. Keep its new
+          // launcher beside Palettes without resetting existing placements.
+          var side = result.left.indexOf("palettes") !== -1 ? "left" : "right";
+          result[side].splice(result[side].indexOf("palettes") + 1, 0, id);
+        } else {
+          result[sides.indexOf(id) !== -1 ? "right" : "bottom"].push(id);
+        }
       }
     });
     return result;

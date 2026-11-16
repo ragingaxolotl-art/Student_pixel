@@ -21,6 +21,7 @@ exports.styles = [
   "css/color-picker-slider.css",
   "css/dialogs.css",
   "css/puppet-studio.css",
+  "css/particle-studio.css",
   "css/dialogs-browse-backups.css",
   "css/dialogs-browse-local.css",
   "css/dialogs-cheatsheet.css",

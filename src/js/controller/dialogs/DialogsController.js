@@ -2,6 +2,10 @@
   var ns = $.namespace("pskl.controller.dialogs");
 
   var dialogs = {
+    "particle-studio": {
+      template: "templates/dialogs/particle-studio.html",
+      controller: ns.ParticleStudioDialogController
+    },
     "puppet-studio": {
       template: "templates/dialogs/puppet-studio.html",
       controller: ns.PuppetStudioDialogController

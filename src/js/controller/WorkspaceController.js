@@ -6,6 +6,7 @@
     preview: "Preview",
     transform: "Transform",
     palettes: "Palettes",
+    studios: "Studios",
     options: "Layer options",
     frames: "Frames",
     layers: "Layers"
@@ -46,6 +47,7 @@
       tools: document.querySelector("#tool-section"),
       transform: document.querySelector(".transformations-container"),
       palettes: document.querySelector(".palettes-list-container"),
+      studios: document.querySelector(".studio-panel"),
       frames: document.querySelector(".frames-column"),
       layers: document.querySelector(".layers-column")
     };

@@ -1,0 +1,24 @@
+<script type="text/template" id="templates/dialogs/particle-studio.html">
+<div class="dialog-wrapper particle-dialog" role="dialog" aria-label="Particle Studio">
+ <header class="particle-heading"><strong class="dialog-title">Particle Studio</strong><span>Drag here to move</span><button type="button" data-particle-action="undo" title="Undo (Ctrl/Cmd+Z)">Undo</button><button type="button" data-particle-action="redo" title="Redo (Ctrl/Cmd+Shift+Z)">Redo</button><button type="button" class="dialog-close" aria-label="Close Particle Studio">×</button></header>
+ <div class="particle-workspace">
+  <section class="particle-viewer" aria-label="Particle workspace">
+   <div class="particle-toolbar"><button type="button" data-mode="move">Move</button><button type="button" data-mode="path">Draw path</button><button type="button" data-mode="edit">Edit path</button><button type="button" data-mode="size">Size</button><label>Zoom <select aria-label="Particle preview zoom"><option value="fit">Fit</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select></label></div>
+   <div class="particle-stage"><div class="particle-image"><canvas aria-label="Particle canvas"></canvas><svg class="particle-overlay" aria-label="Particle handles"></svg></div></div>
+   <p class="particle-hint">Move: drag an emitter. Draw path: drag a route. Size: drag away from the emitter.</p>
+   <section class="particle-timeline" aria-label="Particle timeline">
+    <div class="particle-playback"><button type="button" data-particle-action="play" aria-label="Play particles">▶</button><span data-particle-frame>Frame 1</span><button type="button" data-particle-action="key">+ Position key</button><button type="button" data-particle-action="delete-key">Delete key</button></div>
+    <div class="particle-track" aria-label="Emitter position keys"></div>
+    <input type="range" aria-label="Particle animation frame" min="0" max="23" value="0">
+    <div class="particle-timing"></div>
+   </section>
+  </section>
+  <aside class="particle-side">
+   <section class="particle-layers"><h4>Preview layers</h4><div class="particle-artwork" aria-label="Locked artwork">▣ Artwork <span>Locked</span></div><div class="particle-emitter-list"></div><div class="particle-row"><button type="button" data-particle-action="add">+ Emitter</button><button type="button" data-particle-action="delete">Delete</button><button type="button" data-particle-action="up" aria-label="Move emitter up">↑</button><button type="button" data-particle-action="down" aria-label="Move emitter down">↓</button></div></section>
+   <form class="particle-properties" aria-label="Particle properties"></form>
+   <footer class="particle-footer"><p role="status" aria-live="polite"></p><div class="particle-row"><button type="button" data-particle-action="save">Save effect</button><button type="button" class="particle-generate" data-particle-action="generate">Generate frames</button><button type="button" data-particle-action="cancel">Cancel</button></div></footer>
+  </aside>
+ </div>
+ <button type="button" class="particle-resize" aria-label="Resize Particle Studio" title="Drag to resize">◢</button>
+</div>
+</script>

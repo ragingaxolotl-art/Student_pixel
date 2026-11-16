@@ -10,6 +10,8 @@ Puppet Studio supports manually mapped layered characters, custom joints, pose m
 
 Drawings can be saved in the browser or downloaded as `.piskel` files. Browser saves belong to that browser/device. Moving artwork from the desktop test editor requires exporting and importing its `.piskel` file.
 
+Open **Particle Studio** with the sparkle icon in **Studios**, below Palettes. Drag the studio title bar to move its window and the bottom-right grip to resize it; both are remembered in this browser. Move emitters, draw/edit paths, add position keys, adjust timing and particle properties, or start with fire, smoke, rain, snow, sparks, fountain, magic or embers. **Save effect** keeps editable settings in the project; **Generate frames** adds a locked Particle FX layer while preserving the artwork. Effects support local undo/redo and JSON import/export. The Studios launcher panel can also move with its three-line handle.
+
 ## Develop and verify
 
 Use Node.js 24 and npm:
@@ -21,7 +23,7 @@ npm run build
 npm run test:pages
 ```
 
-The Pages tests run against the built editor under `/Student_pixel/`, checking asset loading, the bottom layout, rotation, and per-pose lock persistence. Install the test browser with `npx playwright install chromium` when needed. `npm run unit-tests` runs the geometry and editor unit suite using Puppeteer's Chrome.
+The Pages tests run against the built editor under `/Student_pixel/`, checking asset loading, draggable panels, the bottom layout, rotation, per-pose locks, and Particle Studio's controls, saved settings, paths and generated output. Install the test browser with `npx playwright install chromium` when needed. `npm run unit-tests` runs the geometry, particle simulation and editor unit suite using Puppeteer's Chrome.
 
 `npm run preview:pages` serves the production build at http://127.0.0.1:8772/Student_pixel/.
 

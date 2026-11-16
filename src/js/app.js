@@ -141,6 +141,12 @@
           $.publish(Events.DIALOG_SHOW, [{ dialogId: "puppet-studio" }]);
         });
 
+      document
+        .querySelector("[data-open-particles]")
+        .addEventListener("click", function () {
+          $.publish(Events.DIALOG_SHOW, [{ dialogId: "particle-studio" }]);
+        });
+
       this.progressBarController = new pskl.controller.ProgressBarController();
       this.progressBarController.init();
 
