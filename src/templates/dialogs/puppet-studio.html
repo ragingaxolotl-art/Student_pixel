@@ -1,0 +1,14 @@
+<script type="text/template" id="templates/dialogs/puppet-studio.html">
+<div class="dialog-wrapper puppet-dialog extra-tools">
+ <header class="puppet-window-heading"><span class="dialog-title">Puppet Studio</span><button type="button" class="dialog-close" aria-label="Close Puppet Studio">×</button></header>
+ <div class="extra-workspace-grid">
+  <select id="extra-tool-picker" aria-label="Studio tool" hidden><option value="rig">Rig</option></select>
+  <aside class="extra-tools-settings"></aside>
+  <section class="extra-tools-viewer" aria-label="Rig workspace">
+   <div class="extra-preview-toolbar"><label>Zoom <select aria-label="Preview zoom"><option value="fit">Fit</option><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select></label></div>
+   <div class="extra-preview-stage"><div class="extra-preview-images"><figure class="extra-preview-after"><canvas data-art-preview="after" aria-label="Rig canvas"></canvas></figure></div></div>
+   <div class="extra-preview-playback" hidden><button type="button" data-action="play-preview" aria-label="Play preview">▶</button><input type="range" aria-label="Preview animation frame" min="0" max="0" value="0"><span data-preview-frame></span></div>
+  </section>
+ </div>
+</div>
+</script>

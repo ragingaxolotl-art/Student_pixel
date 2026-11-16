@@ -1,0 +1,195 @@
+.preview-list-wrapper {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.preview-list-scroller {
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100%;
+  overscroll-behavior-x: contain;
+}
+
+.left-overflow,
+.right-overflow {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 12px;
+  width: 20px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.left-overflow {
+  left: 0;
+  background: linear-gradient(to right, #1d1d1d, transparent);
+}
+
+.right-overflow {
+  right: 0;
+  background: linear-gradient(to left, #1d1d1d, transparent);
+}
+
+.left-overflow-visible .left-overflow,
+.right-overflow-visible .right-overflow {
+  display: block;
+}
+
+.preview-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  min-width: 100%;
+  box-sizing: border-box;
+  list-style-type: none;
+  padding: 6px 8px;
+}
+
+.add-frame-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+  box-sizing: border-box;
+  height: 54px;
+  padding: 6px 0;
+  overflow: hidden;
+  width: 54px;
+
+  border: #888 solid 3px;
+  border-radius: 4px;
+
+  color: #888;
+  background-color: #222;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.add-frame-action-icon {
+  margin: 3px;
+  float: left;
+  flex-shrink: 0;
+}
+
+.add-frame-action .label {
+  display: none;
+}
+
+.add-frame-action:hover {
+  border-color: var(--highlight-color);
+}
+
+.preview-tile {
+  position: relative;
+  border: #444 3px solid;
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin: 0;
+  width: 48px;
+  height: 48px;
+}
+
+.preview-tile:first-child {
+  margin-top: 0;
+}
+
+.preview-tile:hover {
+  border: #999 3px solid;
+}
+
+.tile-view {
+  position: relative;
+}
+
+.preview-tile .tile-overlay {
+  z-index: 10;
+  position: absolute;
+  background-color: rgba(100, 100, 100, 0.6);
+  opacity: 0;
+  height: 30px;
+  width: 30px;
+  border: none;
+}
+
+.preview-tile:hover .tile-overlay {
+  opacity: 1;
+}
+
+.preview-tile .tile-overlay.tile-count {
+  display: block;
+  opacity: 1;
+  border-bottom-right-radius: 3px;
+  top: 0;
+  left: 0;
+  width: auto;
+  min-width: 20px;
+  max-width: 48px;
+  padding: 0 2px;
+  height: 20px;
+  font-size: 11px;
+  line-height: 20px;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  cursor: default;
+}
+
+.preview-tile .tile-overlay.tile-count.toggled {
+  background-color: gold;
+  color: black;
+}
+
+.preview-tile .tile-overlay.delete-frame-action {
+  top: 0;
+  right: 0;
+  border-bottom-left-radius: 3px;
+  cursor: pointer;
+  transform: scale(0.666667);
+  transform-origin: top right;
+}
+
+.preview-tile .tile-overlay.duplicate-frame-action {
+  bottom: 0;
+  right: 0;
+  border-bottom-left-radius: 3px;
+  cursor: pointer;
+  transform: scale(0.666667);
+  transform-origin: bottom right;
+}
+
+.preview-tile .tile-overlay.dnd-action {
+  bottom: 0;
+  left: 0;
+  border-top-right-radius: 3px;
+  cursor: move;
+  transform: scale(0.666667);
+  transform-origin: bottom left;
+}
+
+.preview-tile.selected {
+  border-color: var(--highlight-color);
+}
+
+.preview-tile.selected:after {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 18px;
+  border: transparent 4px solid;
+  border-top-color: var(--highlight-color);
+  border-width: 6px 6px 0;
+  border-style: solid;
+}
+
+/**
+ *  Drag n drop styles.
+ */
+
+.preview-tile-drop-proxy {
+  border: 3px dashed var(--highlight-color);
+  background-color: rgba(255, 215, 0, 0.2);
+}

@@ -1,0 +1,14 @@
+node_modules/
+dest/
+.tools/
+.DS_Store
+.env
+.env.*
+test-results/
+playwright-report/
+src/img/icons.png
+src/img/icons@2x.png
+src/css/icons.css
+*.piskel
+*.glb
+*.zip

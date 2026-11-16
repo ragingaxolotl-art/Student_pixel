@@ -1,0 +1,775 @@
+/* Puppet Studio: artwork and timeline on the left, preview and controls on the right. */
+.puppet-studio .extra-workspace-subtitle {
+  display: none;
+}
+.puppet-studio .extra-workspace-grid {
+  display: block;
+  min-height: 0;
+}
+.puppet-studio .extra-tools-library {
+  display: none;
+}
+.puppet-studio .extra-tools-settings {
+  display: contents;
+}
+.puppet-form:not([hidden]) {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) 300px;
+  grid-template-rows: auto auto minmax(0, 1fr) 95px;
+  gap: 8px;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.puppet-top {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.puppet-top strong {
+  color: gold;
+  font-size: 17px;
+  margin-right: auto;
+}
+.puppet-top label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+.puppet-top select {
+  width: 125px;
+}
+.puppet-tools {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.puppet-tools [aria-pressed="true"] {
+  color: gold;
+  border-color: gold;
+}
+.puppet-studio .extra-tools-viewer {
+  grid-column: 1;
+  grid-row: 3;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+}
+.puppet-studio .extra-preview-heading,
+.puppet-studio .extra-preview-help,
+.puppet-studio .extra-preview-message,
+.puppet-studio .extra-preview-images figcaption,
+.puppet-studio [data-preview-mode] {
+  display: none;
+}
+.puppet-studio .extra-preview-toolbar {
+  padding: 3px 8px;
+  justify-content: flex-end;
+}
+.puppet-studio .extra-preview-stage {
+  flex: 1;
+  min-height: 120px;
+}
+.puppet-side {
+  grid-column: 2;
+  grid-row: 2 / 5;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: #292929;
+  border: 1px solid #555;
+}
+.puppet-mini {
+  flex-shrink: 0;
+  padding: 8px;
+  border-bottom: 1px solid #555;
+}
+.puppet-mini h4 {
+  margin: 0 0 6px;
+  font-size: 12px;
+}
+.puppet-mini canvas {
+  display: block;
+  width: 128px;
+  height: 128px;
+  object-fit: contain;
+  margin: 0 auto 6px;
+  image-rendering: pixelated;
+  background:
+    repeating-conic-gradient(#373737 0% 25%, #414141 0% 50%) 0 / 12px 12px;
+}
+.puppet-mini label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+.puppet-mini input {
+  flex: 1;
+  min-width: 50px;
+}
+.puppet-options {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+  padding: 8px;
+}
+.puppet-hierarchy h4 {
+  margin: 0;
+}
+.puppet-studio .community-rig-tree {
+  max-height: 190px;
+}
+.puppet-studio .community-rig-tree [aria-pressed="true"] {
+  color: gold;
+  background: #45412c;
+}
+.puppet-details {
+  margin: 8px 0;
+  border-top: 1px solid #484848;
+  padding-top: 6px;
+}
+.puppet-details summary,
+.puppet-more-actions summary {
+  cursor: pointer;
+  color: #e3e3e3;
+  padding: 5px 0;
+}
+.puppet-details label {
+  margin: 7px 0;
+}
+.puppet-small-actions {
+  display: flex;
+  gap: 4px;
+}
+.puppet-small-actions button {
+  font-size: 11px;
+  padding: 4px;
+}
+.puppet-footer {
+  flex-shrink: 0;
+  padding: 8px;
+  border-top: 1px solid #555;
+}
+.puppet-footer .extra-tools-actions {
+  max-height: none;
+  margin: 0;
+  display: block;
+  overflow: visible;
+}
+.puppet-primary {
+  display: flex;
+  gap: 6px;
+}
+.puppet-primary button {
+  flex: 1;
+}
+.puppet-primary .button-primary {
+  background: gold;
+  color: #222;
+}
+.puppet-more-actions {
+  max-height: 130px;
+  overflow: auto;
+  margin-top: 4px;
+}
+.puppet-more-actions button {
+  margin: 3px;
+  font-size: 11px;
+}
+.puppet-footer [role="status"] {
+  font-size: 11px;
+  margin: 5px 0 0;
+  max-height: 48px;
+  overflow: auto;
+}
+.puppet-timeline {
+  grid-column: 1;
+  grid-row: 4;
+  padding: 8px 12px;
+  background: #252525;
+  border: 1px solid #555;
+  min-width: 0;
+}
+.puppet-timeline-tools {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+}
+.puppet-timeline-tools button {
+  padding: 4px;
+  font-size: 11px;
+}
+.puppet-timeline-tools select {
+  width: 100px;
+}
+.puppet-track {
+  position: relative;
+  margin: 13px 5px 0;
+  height: 25px;
+  border: 1px solid #666;
+  background: repeating-linear-gradient(
+    to right,
+    transparent 0,
+    transparent calc(100% / var(--rig-frames) - 1px),
+    #505050 calc(100% / var(--rig-frames) - 1px),
+    #505050 calc(100% / var(--rig-frames))
+  );
+}
+.puppet-track .puppet-key {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  transform: translateX(-50%);
+  min-width: 10px;
+  padding: 0 3px;
+  background: #e6b959;
+  border: 1px solid #f4dba0;
+  color: #222;
+  font-size: 10px;
+  cursor: ew-resize;
+}
+.puppet-track [data-key-type="inbetween"] {
+  background: #6bcf9a;
+  border-color: #aff6cf;
+}
+.puppet-track [data-key-type="overshoot"] {
+  background: #cf86e9;
+  border-color: #ebbcfb;
+}
+.puppet-guide-row {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  margin: 5px 0;
+}
+.puppet-guide-row input[type="text"] {
+  width: 65px;
+  min-width: 0;
+}
+.puppet-guide-row input[type="number"] {
+  width: 44px;
+}
+.puppet-guide-row select {
+  width: 35px;
+}
+.puppet-guide-row input[type="color"] {
+  width: 24px;
+  padding: 0;
+}
+.puppet-guide-row button {
+  padding: 3px;
+}
+.puppet-start {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: #151515ed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.puppet-start-panel {
+  width: 430px;
+  max-width: 100%;
+  padding: 22px;
+  border: 1px solid #777;
+  background: #303030;
+  box-shadow: 0 12px 50px #000;
+}
+.puppet-start-panel h3 {
+  color: gold;
+  margin-top: 0;
+}
+.puppet-start-panel p {
+  color: #ccc;
+  line-height: 1.5;
+}
+.puppet-start-panel label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.puppet-start-panel input {
+  width: 70px;
+}
+.puppet-start-panel canvas {
+  display: block;
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  margin: 14px auto;
+  background: #454545;
+}
+.puppet-start-panel button {
+  margin-right: 8px;
+}
+@media (max-width: 800px) {
+  .puppet-form:not([hidden]) {
+    grid-template-columns: minmax(200px, 1fr) 255px;
+    gap: 5px;
+    padding: 5px;
+  }
+  .puppet-mini canvas {
+    width: 80px;
+    height: 80px;
+  }
+  .puppet-top strong {
+    width: 100%;
+  }
+  .puppet-timeline-tools {
+    flex-wrap: wrap;
+  }
+}
+.extra-tools .puppet-form:not([hidden]) {
+  max-width: none;
+  width: 100%;
+  padding: 10px;
+}
+.puppet-studio .extra-preview-images {
+  width: 100%;
+}
+.puppet-source-list {
+  max-height: 180px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.puppet-source-list button {
+  text-align: left;
+  margin: 2px 0;
+  white-space: normal;
+}
+
+/* Standalone studio in the current bottom-frame/bottom-layer editor. */
+#dialog-container-wrapper:has(.puppet-dialog) {
+  padding: 20px;
+}
+.puppet-dialog {
+  background: #262626;
+  border: 1px solid #666;
+  max-width: 1440px;
+  margin: auto;
+  box-sizing: border-box;
+}
+.puppet-window-heading {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-bottom: 1px solid #555;
+  font:
+    600 15px Arial,
+    sans-serif;
+}
+.puppet-window-heading .dialog-close {
+  position: static;
+  margin-left: auto;
+  line-height: 30px;
+  height: 30px;
+  border: 0;
+  background: transparent;
+  color: #ddd;
+  font-size: 25px;
+  cursor: pointer;
+}
+.puppet-dialog .extra-workspace-grid {
+  height: calc(100% - 40px);
+}
+.puppet-dialog .puppet-form:not([hidden]) {
+  display: grid;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  grid-template-columns: minmax(250px, 1fr) 280px;
+  grid-template-rows: 36px minmax(130px, 1fr) 34px 76px 34px;
+  gap: 6px;
+  padding: 8px;
+  font:
+    12px Arial,
+    sans-serif;
+  color: #ddd;
+}
+.puppet-dialog button,
+.puppet-dialog select,
+.puppet-dialog input {
+  font:
+    12px Arial,
+    sans-serif;
+}
+.puppet-dialog .button {
+  padding: 5px 8px;
+  border: 1px solid #5b5b5b;
+  background: #424242;
+  color: #ddd;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.puppet-dialog .button:hover {
+  background: #525252;
+  color: gold;
+}
+.puppet-dialog .button-primary {
+  color: #222;
+  background: gold;
+}
+.puppet-dialog .button-primary:hover {
+  background: #ffe96b;
+  color: #222;
+}
+.puppet-dialog .puppet-top {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 5px;
+}
+.puppet-dialog .puppet-top label {
+  margin-left: auto;
+  font-size: 0;
+}
+.puppet-dialog .puppet-top label select {
+  width: 135px;
+  font-size: 12px;
+}
+.puppet-dialog .extra-tools-viewer {
+  display: flex;
+  flex-direction: column;
+  grid-column: 1;
+  grid-row: 2;
+  min-height: 0;
+  padding: 0;
+  background: #1d1d1d;
+  border: 1px solid #555;
+}
+.puppet-dialog .extra-preview-toolbar {
+  height: 27px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 8px;
+}
+.puppet-dialog .extra-preview-stage {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.puppet-dialog .extra-preview-images {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.puppet-dialog .extra-preview-after {
+  margin: 0;
+  position: relative;
+}
+.puppet-dialog [data-art-preview] {
+  display: block;
+  image-rendering: pixelated;
+  background:
+    repeating-conic-gradient(#373737 0% 25%, #414141 0% 50%) 0 / 12px 12px;
+}
+.puppet-dialog .rig-vector-overlay {
+  position: absolute;
+  pointer-events: none;
+  overflow: hidden;
+  image-rendering: auto;
+}
+.puppet-dialog .puppet-tools {
+  grid-column: 1;
+  grid-row: 3;
+  align-items: stretch;
+  gap: 3px;
+}
+.puppet-dialog .puppet-tools .button {
+  min-width: 52px;
+  padding: 3px 8px;
+}
+.puppet-dialog .puppet-tools [aria-pressed="true"] {
+  color: gold;
+  border-color: #ab9630;
+}
+.puppet-dialog .puppet-timeline {
+  grid-column: 1;
+  grid-row: 4;
+  padding: 5px 12px;
+}
+.puppet-dialog .puppet-timeline-tools {
+  flex-wrap: nowrap;
+}
+.puppet-dialog .puppet-track {
+  margin-top: 7px;
+}
+.puppet-dialog .puppet-guide-bar {
+  grid-column: 1;
+  grid-row: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #555;
+  padding: 2px 5px;
+  background: #303030;
+}
+.puppet-dialog .puppet-guide-bar span {
+  font-size: 10px;
+  color: #aaa;
+  margin-left: auto;
+}
+.puppet-dialog .puppet-side {
+  grid-column: 2;
+  grid-row: 1 / 6;
+  min-height: 0;
+}
+.puppet-dialog .puppet-mini {
+  padding: 6px;
+}
+.puppet-dialog .puppet-mini canvas {
+  width: 100px;
+  height: 100px;
+}
+.puppet-dialog .puppet-mini label {
+  margin: 3px 0 0;
+}
+.puppet-dialog .puppet-hierarchy {
+  flex-shrink: 0;
+  padding: 6px;
+  border-bottom: 1px solid #555;
+}
+.puppet-dialog .community-rig-tree {
+  display: flex;
+  flex-direction: column;
+  max-height: 145px;
+  min-height: 50px;
+  overflow: auto;
+  margin: 5px 0;
+}
+.puppet-dialog .community-rig-tree button {
+  color: #ddd;
+  background: #333;
+  border: 0;
+  padding: 5px;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: left;
+}
+.puppet-dialog .community-rig-tree [aria-pressed="true"] {
+  color: gold;
+  background: #49452f;
+}
+.puppet-dialog .puppet-options {
+  min-height: 70px;
+  overflow: auto;
+  padding: 6px;
+}
+.puppet-dialog .puppet-details label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+.puppet-dialog .puppet-details label input:not([type="checkbox"]),
+.puppet-dialog .puppet-details label select {
+  max-width: 140px;
+  min-width: 50px;
+  box-sizing: border-box;
+}
+.puppet-dialog .puppet-details input[type="number"] {
+  width: 72px;
+}
+.puppet-dialog .puppet-details input[type="color"] {
+  width: 35px;
+}
+.puppet-dialog .puppet-primary button {
+  font-weight: 600;
+}
+.puppet-dialog .puppet-menu {
+  position: relative;
+}
+.puppet-dialog .puppet-menu summary {
+  padding: 6px 8px;
+  background: #3c3c3c;
+  cursor: pointer;
+  border: 1px solid #555;
+}
+.puppet-dialog .puppet-menu-items {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  min-width: 175px;
+  padding: 5px;
+  border: 1px solid #777;
+  background: #303030;
+  z-index: 50;
+  box-shadow: 0 8px 20px #0008;
+}
+.puppet-dialog .puppet-menu-items button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 2px 0;
+}
+.puppet-dialog [hidden] {
+  display: none !important;
+}
+.puppet-studio-entry {
+  width: 100%;
+  margin-top: 5px;
+  height: 26px;
+  font:
+    12px Arial,
+    sans-serif;
+}
+@media (max-height: 750px) {
+  .puppet-dialog .puppet-mini canvas {
+    width: 70px;
+    height: 70px;
+  }
+  .puppet-dialog .community-rig-tree {
+    max-height: 110px;
+  }
+  .puppet-dialog .puppet-guide-bar span {
+    display: none;
+  }
+}
+.puppet-dialog
+  input:not([type="range"]):not([type="color"]):not([type="checkbox"]),
+.puppet-dialog select {
+  background: #242424;
+  color: #ddd;
+  border: 1px solid #666;
+  padding: 3px;
+  border-radius: 2px;
+}
+.transformations-container:not(.show-more) .tools-wrapper {
+  overflow: hidden;
+}
+.transformations-container > .puppet-studio-entry {
+  display: block;
+  clear: both;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 5px 0 0;
+}
+.puppet-dialog .puppet-menu summary,
+.puppet-dialog .puppet-top button {
+  white-space: nowrap;
+}
+@media (max-width: 850px) {
+  .puppet-dialog .puppet-form:not([hidden]) {
+    grid-template-columns: minmax(250px, 1fr) 240px;
+  }
+  .puppet-dialog .puppet-top label select {
+    width: 100px;
+  }
+  .puppet-dialog .puppet-guide-bar span {
+    display: none;
+  }
+}
+.puppet-dialog .puppet-track [data-key-type="key"] {
+  background: #d95f63;
+  border-color: #ffb8bc;
+  color: #fff;
+}
+.puppet-dialog .puppet-track [data-key-type="breakdown"] {
+  background: #66be89;
+  border-color: #bceacb;
+  color: #172c1f;
+}
+.puppet-dialog .puppet-track [data-key-type="inbetween"] {
+  background: #a785c9;
+  border-color: #d4beee;
+  color: #fff;
+}
+.puppet-dialog .puppet-track [data-key-type="anticipation"] {
+  background: #6aa8df;
+  border-color: #b7d8f6;
+  color: #152536;
+}
+.puppet-dialog .puppet-track [data-key-type="overshoot"] {
+  background: #e2a65b;
+  border-color: #f8d2a5;
+  color: #33220d;
+}
+.puppet-dialog .puppet-track [data-key-type="settle"] {
+  background: #65beb9;
+  border-color: #ade4e1;
+  color: #113531;
+}
+.puppet-dialog .puppet-track [aria-current="step"] {
+  outline: 2px solid white;
+  outline-offset: 1px;
+  z-index: 2;
+}
+.joint-motion-overlay {
+  position: absolute;
+  pointer-events: none;
+  overflow: hidden;
+  image-rendering: auto;
+}
+.joint-path-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 7px 0;
+}
+.puppet-dialog .joint-path-panel p {
+  font-size: 11px;
+  line-height: 1.4;
+  margin: 6px 0;
+}
+.puppet-dialog .joint-path-panel select {
+  max-width: 155px;
+}
+.puppet-dialog .joint-path-panel input[type="range"] {
+  min-width: 60px;
+  max-width: 145px;
+}
+.puppet-dialog .joint-path-entry {
+  min-width: 25px;
+  padding: 3px 5px;
+  font-size: 18px;
+  line-height: 15px;
+}
+.puppet-dialog button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.puppet-dialog .puppet-track .joint-path-span {
+  position: absolute;
+  bottom: 2px;
+  height: 3px;
+  background: #58dce8;
+  opacity: 0.8;
+  pointer-events: none;
+}
+.puppet-dialog .joint-path-entry svg {
+  display: block;
+}
+.joint-motion-overlay [tabindex]:focus {
+  outline: 2px solid white;
+}
+@media (max-width: 850px) {
+  .puppet-dialog .puppet-primary button {
+    white-space: nowrap;
+    min-width: 0;
+    font-size: 11px;
+    padding: 5px 4px;
+  }
+}
