@@ -75,6 +75,17 @@
     $.subscribe(
       Events.TOOL_SELECTED,
       function (evt, toolBehavior) {
+        // A hotkey during a selection drag must not turn its mouseup into
+        // a stroke from the newly selected tool. SelectionManager cancels it.
+        if (
+          this.currentToolBehavior instanceof
+            pskl.tools.drawing.selection.BaseSelect &&
+          this.isClicked &&
+          !pskl.app.mouseStateService.isMiddleButtonPressed()
+        ) {
+          this.isClicked = false;
+          $.publish(Events.MOUSE_EVENT, [{ type: "mouseup" }, this]);
+        }
         this.currentToolBehavior = toolBehavior;
         this.overlayFrame.clear();
       }.bind(this)

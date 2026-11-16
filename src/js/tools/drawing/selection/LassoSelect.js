@@ -34,7 +34,7 @@
     this.addPixel_(col, row, frame);
     // use ShapeSelection during selection, contains only the pixels hovered by the user
     var selection = new pskl.selection.ShapeSelection(this.getLassoPixels_());
-    this.setSelection_(selection, overlay);
+    this.updateSelection_(selection, frame, overlay);
   };
 
   /** @override */
@@ -50,7 +50,7 @@
       this.getLassoPixels_(),
       frame
     );
-    this.setSelection_(selection, overlay);
+    this.updateSelection_(selection, frame, overlay);
 
     $.publish(Events.DRAG_END);
   };

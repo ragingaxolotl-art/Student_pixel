@@ -19,18 +19,8 @@
     frame,
     overlay
   ) {
-    if (this.hasSelection) {
-      this.hasSelection = false;
-      this.commitSelection();
-    } else {
-      this.hasSelection = true;
-      this.onDragSelectStart_(col, row);
-      overlay.setPixel(
-        col,
-        row,
-        this.getTransparentVariant_(Constants.SELECTION_TRANSPARENT_COLOR)
-      );
-    }
+    this.onDragSelectStart_(col, row);
+    this.onDragSelect_(col, row, frame, overlay);
   };
 
   /** @override */
@@ -40,17 +30,7 @@
     frame,
     overlay
   ) {
-    if (
-      !this.hasSelection &&
-      (this.startCol !== col || this.startRow !== row)
-    ) {
-      this.hasSelection = true;
-      this.onDragSelectStart_(col, row);
-    }
-
-    if (this.hasSelection) {
-      this.onDragSelect_(col, row, frame, overlay);
-    }
+    this.onDragSelect_(col, row, frame, overlay);
   };
 
   /** @override */
@@ -60,9 +40,7 @@
     frame,
     overlay
   ) {
-    if (this.hasSelection) {
-      this.onDragSelectEnd_(col, row, frame, overlay);
-    }
+    this.onDragSelectEnd_(col, row, frame, overlay);
   };
 
   /** @private */

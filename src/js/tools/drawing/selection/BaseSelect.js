@@ -26,16 +26,36 @@
       },
       { key: "ctrl+c", description: "Copy the selected area" },
       { key: "ctrl+v", description: "Paste the copied area" },
-      { key: "shift", description: "Hold to move the content" }
+      { key: "shift", description: "Add to selection" },
+      { description: "Control-click/drag subtracts (Command also works)" },
+      { key: "alt", description: "Drag selected pixels to move them" },
+      {
+        get key() {
+          return pskl.service.keyboard.Shortcuts.SELECTION.LIFT.getDisplayKey();
+        },
+        description: "Lift selected pixels to a new layer"
+      }
     ];
 
     $.subscribe(
       Events.SELECTION_DISMISSED,
       this.onSelectionDismissed_.bind(this)
     );
+    window.addEventListener(
+      "blur",
+      function () {
+        if (this.isMovingContent_) {
+          this.commitSelection();
+        }
+      }.bind(this)
+    );
   };
 
   pskl.utils.inherit(ns.BaseSelect, pskl.tools.drawing.BaseTool);
+
+  ns.BaseSelect.prototype.supportsAlt = function () {
+    return true;
+  };
 
   /**
    * @override
@@ -47,6 +67,25 @@
     overlay,
     event
   ) {
+    event = event || {};
+    if (!frame.containsPixel(col, row)) {
+      this.mode = null;
+      return;
+    }
+    var current = pskl.app.selectionManager.currentSelection;
+    this.selection = current;
+    this.hasSelection = !!(current && current.pixels.length);
+    this.selectionOperation_ =
+      event.ctrlKey || event.metaKey
+        ? "subtract"
+        : event.shiftKey
+          ? "add"
+          : "replace";
+    this.selectionBase_ = current
+      ? current.pixels.map(function (p) {
+          return { col: p.col, row: p.row };
+        })
+      : [];
     this.startCol = col;
     this.startRow = row;
 
@@ -58,14 +97,40 @@
     // mode to create a selection.
     // If the initial click is on a previous selection, we go in 'moveSelection'
     // mode to allow to move the selection by drag'n dropping it.
-    if (!this.isInSelection(col, row)) {
+    if (
+      this.selectionOperation_ !== "replace" ||
+      !this.isInSelection(col, row)
+    ) {
+      if (this.selectionOperation_ === "replace") {
+        this.commitSelection();
+      }
       this.mode = "select";
+      this.hasSelection = false;
       this.onSelectStart_(col, row, frame, overlay);
     } else {
       this.mode = "moveSelection";
-      if (event.shiftKey && !this.isMovingContent_) {
+      if (event.altKey && !this.isMovingContent_) {
+        var c = pskl.app.piskelController,
+          layer = c.getCurrentLayer(),
+          g = pskl.utils.LayerGroupUtils;
+        if (
+          layer.isLocked() ||
+          layer.rowState.hidden ||
+          g.isGroup(layer) ||
+          g.ancestors(c.getLayers(), layer).some(function (p) {
+            return p.rowState.hidden;
+          })
+        ) {
+          this.mode = null;
+          return;
+        }
+        this.moveSource_ = frame;
+        this.moveOriginal_ = frame.clone();
+        this.selection.fillSelectionFromFrame(frame);
         this.isMovingContent_ = true;
-        $.publish(Events.CLIPBOARD_CUT);
+        this.selection.pixels.forEach(function (p) {
+          frame.setPixel(p.col, p.row, Constants.TRANSPARENT_COLOR);
+        });
         this.drawSelectionOnOverlay_(overlay);
       }
       this.onSelectionMoveStart_(col, row, frame, overlay);
@@ -104,6 +169,11 @@
     } else if (this.mode == "moveSelection") {
       this.onSelectionMoveEnd_(col, row, frame, overlay);
     }
+    this.mode = null;
+    this.selectionBase_ = null;
+    if (!this.hasSelection) {
+      $.publish(Events.SELECTION_DISMISSED);
+    }
   };
 
   /**
@@ -118,8 +188,14 @@
     overlay,
     event
   ) {
+    event = event || {};
     if (overlay.containsPixel(col, row)) {
-      if (this.isInSelection(col, row)) {
+      if (
+        !event.shiftKey &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        this.isInSelection(col, row)
+      ) {
         // We're hovering the selection, show the move tool:
         document.body.classList.add(this.secondaryToolId);
         document.body.classList.remove(this.toolId);
@@ -152,11 +228,6 @@
    * typically by clicking outside of the selected area.
    */
   ns.BaseSelect.prototype.commitSelection = function () {
-    if (this.isMovingContent_) {
-      $.publish(Events.CLIPBOARD_PASTE);
-      this.isMovingContent_ = false;
-    }
-
     // Clean previous selection:
     $.publish(Events.SELECTION_DISMISSED);
   };
@@ -165,9 +236,34 @@
    * Protected method, should be called when the selection is dismissed.
    */
   ns.BaseSelect.prototype.onSelectionDismissed_ = function () {
+    // Switching projects/tools during an unfinished pixel drag cancels it.
+    if (this.isMovingContent_ && this.moveSource_ && this.moveOriginal_) {
+      this.moveSource_.setPixels(this.moveOriginal_.pixels);
+    }
+    this.isMovingContent_ = false;
+    this.moveSource_ = this.moveOriginal_ = null;
     var overlay = pskl.app.drawingController.overlayFrame;
     overlay.clear();
     this.hasSelection = false;
+    this.selection = null;
+    this.mode = null;
+  };
+
+  ns.BaseSelect.prototype.updateSelection_ = function (
+    selection,
+    frame,
+    overlay
+  ) {
+    this.selection = pskl.selection.BaseSelection.combine(
+      this.selectionBase_ || [],
+      selection.pixels,
+      this.selectionOperation_ || "replace",
+      frame
+    );
+    this.hasSelection = this.selection.pixels.length > 0;
+    $.publish(Events.SELECTION_CREATED, [this.selection]);
+    overlay.clear();
+    this.drawSelectionOnOverlay_(overlay);
   };
 
   /**
@@ -189,6 +285,9 @@
 
   ns.BaseSelect.prototype.getTransparentVariant_ =
     pskl.utils.FunctionUtils.memo(function (colorStr) {
+      if (typeof colorStr === "number") {
+        colorStr = pskl.utils.intToColor(colorStr);
+      }
       var color = window.tinycolor(colorStr);
       color = window.tinycolor.lighten(color, 10);
       color.setAlpha(0.5);
@@ -245,5 +344,34 @@
     overlay
   ) {
     this.onSelectionMove_(col, row, frame, overlay);
+    if (this.isMovingContent_) {
+      if (frame !== this.moveSource_) {
+        this.commitSelection();
+        return;
+      }
+      this.selection.pixels.forEach(function (p) {
+        if (pskl.utils.colorToInt(p.color) >>> 24) {
+          frame.setPixel(p.col, p.row, p.color);
+        }
+      });
+      var changed = frame.pixels.some(
+        function (p, i) {
+          return p !== this.moveOriginal_.pixels[i];
+        }.bind(this)
+      );
+      this.isMovingContent_ = false;
+      this.moveSource_ = this.moveOriginal_ = null;
+      this.selection.pixels = this.selection.pixels.map(function (p) {
+        return { col: p.col, row: p.row };
+      });
+      this.selection.hasPastedContent = false;
+      overlay.clear();
+      this.drawSelectionOnOverlay_(overlay);
+      if (changed) {
+        $.publish(Events.PISKEL_SAVE_STATE, {
+          type: pskl.service.HistoryService.SNAPSHOT
+        });
+      }
+    }
   };
 })();

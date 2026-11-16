@@ -3,7 +3,8 @@
 
   var SELECTION_REPLAY = {
     PASTE: "REPLAY_PASTE",
-    ERASE: "REPLAY_ERASE"
+    ERASE: "REPLAY_ERASE",
+    LIFT: "REPLAY_LIFT"
   };
 
   ns.SelectionManager = function (piskelController) {
@@ -35,8 +36,24 @@
       shortcuts.SELECTION.COMMIT,
       this.commit.bind(this)
     );
+    pskl.app.shortcutService.registerShortcut(
+      shortcuts.SELECTION.LIFT,
+      this.lift.bind(this)
+    );
 
     $.subscribe(Events.TOOL_SELECTED, this.onToolSelected_.bind(this));
+    $.subscribe(
+      Events.PISKEL_RESET,
+      function () {
+        if (
+          (this.selectionPiskel_ &&
+            this.selectionPiskel_ !== this.piskelController.getPiskel()) ||
+          (this.activeTool_ && this.activeTool_.isMovingContent_)
+        ) {
+          $.publish(Events.SELECTION_DISMISSED);
+        }
+      }.bind(this)
+    );
   };
 
   /**
@@ -53,11 +70,121 @@
    * @private
    */
   ns.SelectionManager.prototype.onToolSelected_ = function (evt, tool) {
+    if (this.activeTool_ && this.activeTool_.isMovingContent_) {
+      $.publish(Events.SELECTION_DISMISSED);
+    }
     var isSelectionTool =
       tool instanceof pskl.tools.drawing.selection.BaseSelect;
     if (!isSelectionTool) {
-      this.cleanSelection_();
+      $.publish(Events.SELECTION_DISMISSED);
+    } else {
+      tool.selection = this.currentSelection;
+      tool.hasSelection = !!(
+        this.currentSelection && this.currentSelection.pixels.length
+      );
+      if (tool.hasSelection) {
+        tool.drawSelectionOnOverlay_(pskl.app.drawingController.overlayFrame);
+      }
     }
+    this.activeTool_ = isSelectionTool ? tool : null;
+  };
+
+  ns.SelectionManager.prototype.lift = function () {
+    var c = this.piskelController,
+      layer = c.getCurrentLayer(),
+      frame = c.getCurrentFrame(),
+      g = pskl.utils.LayerGroupUtils;
+    if (pskl.app.drawingController.isClicked) {
+      return;
+    }
+    if (!this.currentSelection || !this.currentSelection.pixels.length) {
+      $.publish(Events.SHOW_NOTIFICATION, [
+        { content: "Select some pixels first." }
+      ]);
+      return;
+    }
+    if (
+      layer.isLocked() ||
+      g.isGroup(layer) ||
+      layer.rowState.hidden ||
+      g.ancestors(c.getLayers(), layer).some(function (p) {
+        return p.rowState.hidden;
+      })
+    ) {
+      $.publish(Events.SHOW_NOTIFICATION, [
+        { content: "Choose an unlocked, visible artwork layer to lift pixels." }
+      ]);
+      return;
+    }
+    var pixels = ns.BaseSelection.combine(
+      [],
+      this.currentSelection.pixels,
+      "replace",
+      frame
+    )
+      .pixels.map(function (p) {
+        return { col: p.col, row: p.row, color: frame.getPixel(p.col, p.row) };
+      })
+      .filter(function (p) {
+        return p.color >>> 24;
+      });
+    if (!pixels.length) {
+      $.publish(Events.SHOW_NOTIFICATION, [
+        { content: "The selection contains no painted pixels on this frame." }
+      ]);
+      return;
+    }
+    var name = layer.getName() + " · lifted",
+      suffix = 2;
+    while (
+      c.getLayers().some(function (l) {
+        return l.getName() === name;
+      })
+    ) {
+      name = layer.getName() + " · lifted " + suffix++;
+    }
+    var data = {
+        type: SELECTION_REPLAY.LIFT,
+        pixels: pixels,
+        name: name,
+        id: pskl.utils.Uuid.generate(),
+        parent: layer.rowState.parentGroup || null,
+        opacity: layer.getOpacity()
+      },
+      state = {
+        layerIndex: c.getCurrentLayerIndex(),
+        frameIndex: c.getCurrentFrameIndex()
+      };
+    $.publish(Events.SELECTION_DISMISSED);
+    this.liftPixels_(frame, data);
+    $.publish(Events.PISKEL_SAVE_STATE, {
+      type: pskl.service.HistoryService.REPLAY,
+      scope: this,
+      replay: data,
+      state: state
+    });
+    $.publish(Events.PISKEL_RESET);
+  };
+  ns.SelectionManager.prototype.liftPixels_ = function (frame, data) {
+    var c = this.piskelController,
+      source = c.getCurrentLayer(),
+      index = c.getCurrentLayerIndex(),
+      lifted = pskl.model.Layer.fromFrames(
+        data.name,
+        source.getFrames().map(function (f) {
+          return pskl.model.Frame.createEmptyFromFrame(f);
+        })
+      ),
+      target = lifted.getFrameAt(c.getCurrentFrameIndex());
+    lifted.rowState.parentGroup = data.parent;
+    lifted.rowState.groupNodeId = data.id;
+    lifted.setOpacity(data.opacity);
+    data.pixels.forEach(function (p) {
+      target.setPixel(p.col, p.row, p.color);
+      frame.setPixel(p.col, p.row, Constants.TRANSPARENT_COLOR);
+    });
+    c.getPiskel().addLayerAt(lifted, index + 1);
+    c.getWrappedPiskelController().setCurrentLayerIndex(index + 1);
   };
 
   /**
@@ -227,7 +354,9 @@
   };
 
   ns.SelectionManager.prototype.replay = function (frame, replayData) {
-    if (replayData.type === SELECTION_REPLAY.PASTE) {
+    if (replayData.type === SELECTION_REPLAY.LIFT) {
+      this.liftPixels_(frame, replayData);
+    } else if (replayData.type === SELECTION_REPLAY.PASTE) {
       this.pastePixels_(frame, replayData.pixels);
     } else if (replayData.type === SELECTION_REPLAY.ERASE) {
       replayData.pixels.forEach(function (pixel) {
@@ -254,6 +383,9 @@
   ) {
     if (selection) {
       this.currentSelection = selection;
+      if (this.piskelController.getPiskel) {
+        this.selectionPiskel_ = this.piskelController.getPiskel();
+      }
     } else {
       console.error("No selection provided to SelectionManager");
     }

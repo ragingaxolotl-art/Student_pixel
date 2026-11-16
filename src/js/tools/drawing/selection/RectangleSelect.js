@@ -34,14 +34,13 @@
     overlay
   ) {
     overlay.clear();
-    this.selection = new pskl.selection.RectangularSelection(
+    var selection = new pskl.selection.RectangularSelection(
       this.startCol,
       this.startRow,
       col,
       row
     );
-    $.publish(Events.SELECTION_CREATED, [this.selection]);
-    this.drawSelectionOnOverlay_(overlay);
+    this.updateSelection_(selection, frame, overlay);
   };
 
   /** @override */

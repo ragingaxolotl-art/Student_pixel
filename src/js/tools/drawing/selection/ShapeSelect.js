@@ -27,21 +27,16 @@
     frame,
     overlay
   ) {
-    if (this.hasSelection) {
-      this.hasSelection = false;
-      this.commitSelection();
-    } else {
-      this.hasSelection = true;
-      // From the pixel clicked, get shape using an algorithm similar to the paintbucket one:
-      var pixels = pskl.PixelUtils.getSimilarConnectedPixelsFromFrame(
-        frame,
-        col,
-        row
-      );
-      this.selection = new pskl.selection.ShapeSelection(pixels);
-
-      $.publish(Events.SELECTION_CREATED, [this.selection]);
-      this.drawSelectionOnOverlay_(overlay);
-    }
+    // From the pixel clicked, get shape using an algorithm similar to the paintbucket one:
+    var pixels = pskl.PixelUtils.getSimilarConnectedPixelsFromFrame(
+      frame,
+      col,
+      row
+    );
+    this.updateSelection_(
+      new pskl.selection.ShapeSelection(pixels),
+      frame,
+      overlay
+    );
   };
 })();

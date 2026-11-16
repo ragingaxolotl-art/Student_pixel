@@ -63,6 +63,11 @@
     },
 
     SELECTION: {
+      LIFT: createShortcut(
+        "selection-lift-new-layer",
+        "Lift selected pixels to a new layer",
+        "ctrl+shift+J"
+      ),
       CUT: createShortcut("selection-cut", "Cut selection", "ctrl+X"),
       COPY: createShortcut("selection-copy", "Copy selection", "ctrl+C"),
       PASTE: createShortcut("selection-paste", "Paste selection", "ctrl+V"),

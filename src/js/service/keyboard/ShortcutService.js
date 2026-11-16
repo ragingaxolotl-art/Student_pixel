@@ -77,7 +77,12 @@
 
   ns.ShortcutService.prototype.isInInput_ = function (evt) {
     var targetTagName = evt.target.nodeName.toUpperCase();
-    return targetTagName === "INPUT" || targetTagName === "TEXTAREA";
+    return (
+      targetTagName === "INPUT" ||
+      targetTagName === "TEXTAREA" ||
+      targetTagName === "SELECT" ||
+      !!evt.target.isContentEditable
+    );
   };
 
   ns.ShortcutService.prototype.getShortcutById = function (id) {

@@ -5,6 +5,35 @@
     this.reset();
   };
 
+  // A gesture always combines with its original mask, rather than accumulating
+  // every intermediate rectangle/lasso. Only geometry belongs in the mask.
+  ns.BaseSelection.combine = function (base, incoming, operation, frame) {
+    var mask = new Map();
+    function valid(p) {
+      return (
+        Number.isInteger(p.col) &&
+        Number.isInteger(p.row) &&
+        frame.containsPixel(p.col, p.row)
+      );
+    }
+    function add(p) {
+      if (valid(p)) {
+        mask.set(p.col + ":" + p.row, { col: p.col, row: p.row });
+      }
+    }
+    if (operation !== "replace") {
+      base.forEach(add);
+    }
+    incoming.forEach(function (p) {
+      if (operation === "subtract") {
+        mask.delete(p.col + ":" + p.row);
+      } else {
+        add(p);
+      }
+    });
+    return new ns.ShapeSelection(Array.from(mask.values()));
+  };
+
   ns.BaseSelection.prototype.stringify = function () {
     return JSON.stringify({
       pixels: this.pixels,
