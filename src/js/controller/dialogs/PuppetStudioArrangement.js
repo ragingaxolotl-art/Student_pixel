@@ -32,7 +32,49 @@
     var rig = menu("Rig"),
       poses = menu("Poses"),
       clips = menu("Clips");
-    top.prepend(rig.parentElement, poses.parentElement, clips.parentElement);
+    var tutorials = this.puppetButton(
+      "Tutorials",
+      function () {
+        var dialog = document.createElement("dialog");
+        dialog.className = "puppet-tutorial-dialog";
+        dialog.setAttribute("aria-label", "Puppet Studio tutorials");
+        var heading = document.createElement("h3");
+        heading.textContent = "Connect both legs to a pelvis";
+        var close = document.createElement("button");
+        close.type = "button";
+        close.textContent = "Close tutorial";
+        var video = document.createElement("video");
+        video.controls = true;
+        video.preload = "metadata";
+        video.setAttribute("aria-label", "Narrated pelvis connector tutorial");
+        video.src = new URL(
+          "tutorials/pelvis-connector.mp4",
+          document.baseURI
+        ).href;
+        close.onclick = function () {
+          video.pause();
+          dialog.close();
+          dialog.remove();
+        };
+        dialog.addEventListener("cancel", function () {
+          video.pause();
+          dialog.remove();
+        });
+        dialog.addEventListener("keydown", function (event) {
+          event.stopPropagation();
+        });
+        dialog.append(heading, close, video);
+        this.owner.wrapper.append(dialog);
+        dialog.showModal();
+      },
+      top
+    );
+    top.prepend(
+      rig.parentElement,
+      poses.parentElement,
+      clips.parentElement,
+      tutorials
+    );
     rig.append(start, custom);
     var proxy = function (label, id, parent) {
       this.puppetButton(
