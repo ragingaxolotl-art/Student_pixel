@@ -89,6 +89,90 @@
       layers.forEach(visit);
       layers.splice.apply(layers, [0, layers.length].concat(ordered));
     },
+    duplicate: function (layers, layer) {
+      if (layers.indexOf(layer) === -1) {
+        return null;
+      }
+      this.normalize(layers);
+      var branch = new Set([layer].concat(this.descendants(layers, layer))),
+        source = layers.filter(function (item) {
+          return branch.has(item);
+        }),
+        copies = source.map(function (item) {
+          return ns.LayerUtils.clone(item);
+        }),
+        ids = new Map();
+      source.forEach(function (item, index) {
+        ids.set(
+          ns.LayerGroupUtils.id(item),
+          ns.LayerGroupUtils.id(copies[index])
+        );
+      });
+      copies.forEach(function (copy, index) {
+        var original = source[index],
+          parentId = ns.LayerGroupUtils.state(original).parentGroup;
+        ns.LayerGroupUtils.state(copy).parentGroup =
+          ids.get(parentId) || parentId || null;
+        if (original !== layer) {
+          copy.setName(original.getName());
+        }
+      });
+      var rootCopy = copies[source.indexOf(layer)];
+      layers.splice.apply(
+        layers,
+        [layers.indexOf(layer) + 1, 0].concat(copies)
+      );
+      this.normalize(layers);
+      return rootCopy;
+    },
+    moveTo: function (layers, layer, target, position) {
+      if (
+        layers.indexOf(layer) === -1 ||
+        layer === target ||
+        (target &&
+          (layers.indexOf(target) === -1 ||
+            this.ancestors(layers, target).indexOf(layer) !== -1))
+      ) {
+        return false;
+      }
+      if (position === "inside" && (!target || !this.isGroup(target))) {
+        return false;
+      }
+      var parent = !target
+        ? null
+        : position === "inside"
+          ? target
+          : this.parent(layers, target);
+      var branch = new Set([layer].concat(this.descendants(layers, layer)));
+      var moving = layers.filter(function (item) {
+        return branch.has(item);
+      });
+      var kept = layers.filter(function (item) {
+        return !branch.has(item);
+      });
+      var at = 0;
+      if (target) {
+        at = kept.indexOf(target);
+        if (position === "above") {
+          at++;
+        } else if (position === "below") {
+          var targetBranch = new Set(
+            [target].concat(this.descendants(kept, target))
+          );
+          at = kept.findIndex(function (item) {
+            return targetBranch.has(item);
+          });
+        }
+      }
+      this.state(layer).parentGroup = parent ? this.id(parent) : null;
+      if (position === "inside") {
+        this.state(target).collapsed = false;
+      }
+      kept.splice.apply(kept, [at, 0].concat(moving));
+      layers.splice.apply(layers, [0, layers.length].concat(kept));
+      this.normalize(layers);
+      return true;
+    },
     move: function (layers, layer, direction) {
       var parent = this.parent(layers, layer),
         siblings = layers.filter(function (l) {

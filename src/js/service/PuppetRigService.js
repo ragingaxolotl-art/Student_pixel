@@ -44,15 +44,9 @@
         animation ? r.poseAt(rig, clip, 0) : rig.workingPose
       ),
       framesByGroup = new Map();
-    var groupCount = new Set(
-        rig.bones
-          .filter(function (b) {
-            return b.layerId || rig.skin;
-          })
-          .map(function (b) {
-            return b.group;
-          })
-      ).size,
+    var groupCount = placement.filter(function (entry) {
+        return entry.kind === "group";
+      }).length,
       baseCount = p.getLayers().filter(function (l) {
         return !(
           l.toolState.communityOwned && l.toolState.kind === "community-rig"
@@ -66,7 +60,7 @@
     );
     for (var i = 0; i < count; i++) {
       var pose = animation ? r.poseAt(rig, clip, i) : rig.workingPose;
-      renderer.groups(pose).forEach(function (frame, name) {
+      renderer.groups(pose, true).forEach(function (frame, name) {
         if (!framesByGroup.has(name)) {
           framesByGroup.set(name, []);
         }
@@ -102,7 +96,7 @@
     var bound = new Set();
     rig.bones.forEach(function (b) {
       var binding = renderer.source(b);
-      if (binding) {
+      if (binding && !pskl.utils.LayerGroupUtils.isGroup(binding)) {
         bound.add(binding.toolState.id);
       }
       renderer.sources(b).forEach(function (l) {
@@ -130,13 +124,19 @@
           l.toolState.group === name
         );
       });
-      var layer = pskl.model.Layer.fromFrames("Rig: " + name, frames);
+      var entry = placement.find(function (item) {
+        return item.kind === "group" && item.name === name;
+      });
+      var layer = pskl.model.Layer.fromFrames("Rig: " + entry.label, frames);
       layer.toolState = {
         id: previous ? previous.toolState.id : pskl.utils.Uuid.generate(),
         communityOwned: true,
         kind: "community-rig",
         group: name,
-        locked: true
+        locked: true,
+        parentGroup: entry.source
+          ? entry.source.rowState.parentGroup || null
+          : null
       };
       generated.set(name, layer);
     });
@@ -182,7 +182,7 @@
       rig.skin = false;
       rig.referenceFrame = previous.referenceFrame;
       rig.guides = previous.guides;
-      selected = rig.bones[0].id;
+      selected = rig.bones[0] ? rig.bones[0].id : null;
     } else if (action === "save-draft") {
       rig = clone(context.rigDragDraft);
       if (!rig) {
@@ -209,6 +209,7 @@
         layerId: null
       };
       rig.bones.push(b);
+      rig.empty = false;
       selected = b.id;
     } else if (action === "delete") {
       if (!bone || rig.bones.length <= 1) {
@@ -217,6 +218,21 @@
       var world = r.world(rig, {}),
         parent = bone.parent ? world[bone.parent] : null,
         base = parent ? parent.endMatrix : r.identity();
+      if (bone.deformSource && bone.parent) {
+        var joined = rig.bones.find(function (b) {
+          return b.id === bone.parent;
+        });
+        joined.length += bone.length;
+        joined.radiusEnd = bone.radiusEnd;
+        base = r.multiply(world[joined.id].matrix, [
+          1,
+          0,
+          0,
+          1,
+          joined.length,
+          0
+        ]);
+      }
       rig.bones.forEach(function (b) {
         if (b.parent === bone.id) {
           var start = r.point(
@@ -238,11 +254,17 @@
       rig.bones = rig.bones.filter(function (b) {
         return b.id !== bone.id;
       });
+      rig.bones.forEach(function (b) {
+        if (b.deformSource === bone.id) {
+          delete b.deformSource;
+          delete b.articulation;
+        }
+      });
       delete rig.workingPose[bone.id];
       rig.poses.forEach(function (pose) {
         delete pose.values[bone.id];
       });
-      selected = rig.bones[0].id;
+      selected = rig.bones[0] ? rig.bones[0].id : null;
     } else if (action === "disconnect") {
       if (!bone) {
         throw new Error("Choose a bone.");
@@ -371,12 +393,12 @@
             : null;
         }
       });
-      selected = rig.bones[0].id;
+      selected = rig.bones[0] ? rig.bones[0].id : null;
     } else if (action === "bake" || action === "bake-pose") {
       r.validate(rig);
       this.bakeRig(p, rig, action === "bake");
       context.refreshRig(true, selected);
-      return "Rig baked on protected group layers. Bound source pixels are kept and their visibility can be restored by Remove rig output.";
+      return "Rig baked in source layer order. Source pixels are kept; Remove rig output restores their visibility.";
     } else if (action === "remove-output") {
       var out = px.cloneProject(p),
         layers = out.getLayers(),

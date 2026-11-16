@@ -141,9 +141,19 @@
       ["rest", "Fit bones", "Move pivots and change bone lengths"],
       ["select", "Select", "Select a joint without moving it"],
       [
+        "connector",
+        "Connector",
+        "Click a body segment to place a shoulder or pelvis attachment"
+      ],
+      [
+        "connect",
+        "Attach limb",
+        "Select a connector, then click a limb segment to attach it"
+      ],
+      [
         "add",
         "Add joint",
-        "Select a parent, then click the character to extend it"
+        "Drag from anywhere on a segment to attach a joint; click empty space to extend the selected bone"
       ]
     ];
     modes.forEach(
@@ -160,9 +170,51 @@
         );
         b.dataset.rigMode = mode[0];
         b.title = mode[2];
+        if (mode[0] === "connect") {
+          this.puppetConnectButton = b;
+        }
       }.bind(this)
     );
-    form.elements["rig-editMode"].append(new Option("Add joints", "add"));
+    form.elements["rig-editMode"].append(
+      new Option("Add joints", "add"),
+      new Option("Connector", "connector"),
+      new Option("Attach limb", "connect"),
+      new Option("Split segment", "split")
+    );
+    this.puppetButton(
+      "Split segment",
+      function () {
+        this.write("rig", { editMode: "split", previewAnimation: false });
+        this.refreshPuppet();
+        owner.refreshWorkspacePreview_();
+      },
+      this.puppetTools
+    ).dataset.rigMode = "split";
+    var bendingLabel = node("label", "", "Bending "),
+      bending = node("select");
+    bending.setAttribute("aria-label", "Segment articulation");
+    bending.add(new Option("Hinge", "hinge"));
+    bending.add(new Option("Flexible", "flexible"));
+    bending.title =
+      "Used by Split segment. Add joint keeps the parent artwork solid.";
+    bendingLabel.append(bending);
+    this.puppetTools.append(bendingLabel);
+    this.segmentArticulation = bending;
+    bending.addEventListener(
+      "change",
+      function () {
+        var rig = this.puppetRig(),
+          bone = rig.bones.find(
+            function (b) {
+              return b.id === this.read("rig").bone;
+            }.bind(this)
+          );
+        if (bone && bone.deformSource) {
+          bone.articulation = bending.value;
+          this.savePuppetDraft(rig, bone.id);
+        }
+      }.bind(this)
+    );
     this.puppetLock = this.puppetButton(
       "Lock joint",
       this.togglePuppetLock,
@@ -208,7 +260,7 @@
     this.puppetButton(
       "+ Joint",
       function () {
-        this.puppetAction("add");
+        this.puppetAction(this.puppetRig().bones.length ? "add" : "root");
       },
       treeButtons
     );
@@ -227,6 +279,20 @@
       treeButtons
     );
     this.puppetTree.append(treeButtons);
+    this.puppetClearButton = this.puppetButton(
+      "Clear joints",
+      async function () {
+        var empty = r.clearJoints(clone(this.puppetRig()));
+        await this.savePuppetDraft(empty);
+        this.write("rig", { editMode: "add", previewAnimation: false });
+        this.refreshPuppet();
+        form.querySelector('[role="status"]').textContent =
+          "Joints cleared. Artwork and frames are kept. Undo restores the rig.";
+      },
+      treeButtons
+    );
+    this.puppetClearButton.title =
+      "Clear all joints and pose keys. Artwork is kept; Undo restores the rig.";
     scroll.append(this.puppetTree);
     var sections = {};
     [
@@ -553,7 +619,10 @@
             skin: false,
             editMode: "rest"
           });
-          await this.savePuppetDraft(setup, setup.bones[0].id);
+          await this.savePuppetDraft(
+            setup,
+            setup.bones[0] ? setup.bones[0].id : null
+          );
           chooser.remove();
           this.puppetChooser = null;
         } catch (e) {
@@ -591,7 +660,7 @@
           '[aria-label="Preview animation frame"]'
         ).value
       );
-    return options.editMode === "rest" || options.editMode === "add"
+    return r.isSetupMode(options.editMode)
       ? {}
       : options.previewAnimation && clip && clip.keys.length
         ? r.poseAt(rig, clip, frame)
@@ -713,6 +782,17 @@
     }
     var rig = r.config(pskl.app.piskelController.getPiskel()),
       o = this.read("rig");
+    var selectedBone = rig.bones.find(function (b) {
+      return b.id === o.bone;
+    });
+    if (this.puppetConnectButton) {
+      this.puppetConnectButton.disabled = !(
+        selectedBone && selectedBone.connector
+      );
+    }
+    if (this.puppetClearButton) {
+      this.puppetClearButton.disabled = !rig.bones.length;
+    }
     this.puppetTools.querySelectorAll("[data-rig-mode]").forEach(function (b) {
       b.setAttribute("aria-pressed", String(b.dataset.rigMode === o.editMode));
     });
@@ -769,6 +849,7 @@
             ? "Bound to " + bound.name
             : "Bind " + layer.getName() + " to the selected joint";
           b.setAttribute("aria-label", "Bind layer " + layer.getName());
+          b.disabled = !selectedBone || !!selectedBone.connector;
         }.bind(this)
       );
     this.puppetGuideList.replaceChildren();

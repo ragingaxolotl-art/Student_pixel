@@ -1,0 +1,204 @@
+.fake-piskelapp-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 46px 0 8px;
+  box-sizing: border-box;
+  text-align: left;
+  line-height: normal;
+}
+.fake-piskelapp-header .piskel-name {
+  font-size: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: min(28vw, 300px);
+  min-width: 70px;
+}
+.dither-options[hidden],
+.dither-pattern-menu[hidden] {
+  display: none;
+}
+.dither-options {
+  color: #ddd;
+  font:
+    11px Arial,
+    sans-serif;
+}
+.dither-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.dither-field {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 0;
+  color: #bbb;
+  font:
+    11px Arial,
+    sans-serif;
+}
+.dither-field select,
+.dither-options button {
+  box-sizing: border-box;
+  color: #e4e4e4;
+  background: #383838;
+  border: 1px solid #777;
+  border-radius: 1px;
+  font:
+    11px Arial,
+    sans-serif;
+}
+.dither-field select {
+  height: 19px;
+  width: 100%;
+  padding: 0 2px;
+  margin: 0;
+}
+.dither-field select:disabled {
+  opacity: 0.65;
+}
+.dither-pattern-field {
+  width: 56px;
+}
+.dither-density-field {
+  width: 96px;
+}
+.dither-options .dither-density-mode {
+  align-self: start;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  height: 13px;
+  color: #bbb;
+  cursor: pointer;
+}
+.dither-options .dither-density-mode[aria-pressed="true"] {
+  color: gold;
+}
+.dither-density-control {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 19px;
+}
+.dither-density-control input {
+  width: 62px;
+  min-width: 0;
+  margin: 0;
+  accent-color: gold;
+}
+.dither-density-value {
+  width: 31px;
+  font-size: 10px;
+  text-align: right;
+}
+[data-dither-mode="density"] .dither-density-value {
+  color: gold;
+}
+.dither-scale-field {
+  width: 46px;
+}
+.dither-colors-field {
+  width: 86px;
+}
+.dither-pattern-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 19px;
+  width: 100%;
+  padding: 1px 3px;
+  cursor: pointer;
+}
+.dither-pattern-trigger canvas {
+  width: 32px;
+  height: 16px;
+  image-rendering: pixelated;
+}
+.dither-pattern-menu {
+  position: fixed;
+  z-index: 1200;
+  box-sizing: border-box;
+  width: 116px;
+  max-height: min(242px, calc(100vh - 50px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: #292929;
+  border: 1px solid #777;
+  box-shadow: 0 5px 16px #0008;
+}
+.dither-pattern-menu .dither-pattern-choice {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 72px;
+  padding: 5px 2px;
+  cursor: pointer;
+}
+.dither-pattern-choice canvas {
+  width: 64px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+.dither-pattern-name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  min-height: 24px;
+  line-height: 12px;
+}
+.dither-pattern-choice[aria-pressed="true"] {
+  color: gold;
+  border-color: gold;
+  box-shadow: inset 0 0 0 1px gold;
+}
+.dither-options button:focus-visible,
+.dither-options select:focus-visible {
+  outline: 2px solid gold;
+  outline-offset: 1px;
+}
+.dither-compact {
+  display: none;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+.dither-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+@media (max-width: 680px) {
+  .fake-piskelapp-header .piskel-name {
+    max-width: calc(100vw - 200px);
+  }
+  .dither-compact {
+    display: block;
+  }
+  .dither-controls {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 8px;
+    padding: 10px;
+    background: #292929;
+    border: 1px solid #777;
+    box-shadow: 0 5px 16px #0008;
+  }
+  .dither-options.controls-open .dither-controls {
+    display: flex;
+  }
+}

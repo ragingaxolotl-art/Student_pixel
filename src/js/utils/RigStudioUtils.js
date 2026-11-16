@@ -209,7 +209,7 @@
         !rig ||
         rig.version !== 1 ||
         !Array.isArray(rig.bones) ||
-        !rig.bones.length ||
+        (!rig.bones.length && !rig.empty) ||
         rig.bones.length > 64 ||
         !Array.isArray(rig.poses) ||
         rig.poses.length > 128 ||
@@ -217,7 +217,7 @@
         rig.clips.length > 32
       ) {
         throw new Error(
-          "Use a version-1 rig with 1–64 bones, up to 128 poses and 32 clips."
+          "Use a version-1 rig with up to 64 joints, 128 poses and 32 clips."
         );
       }
       if (
@@ -262,6 +262,13 @@
         }
         ids.add(b.id);
         byId[b.id] = b;
+        if (
+          b.deformSource !== undefined &&
+          (typeof b.deformSource !== "string" ||
+            !["hinge", "flexible"].includes(b.articulation))
+        ) {
+          throw new Error("Invalid segment articulation.");
+        }
         checkPin(b.pin);
         ["x", "y", "angle", "length", "radius", "radiusEnd", "bulge"].forEach(
           function (k) {
@@ -271,7 +278,9 @@
           }
         );
         if (
-          b.length < 1 ||
+          (b.connector !== undefined && typeof b.connector !== "boolean") ||
+          b.length < (b.connector ? 0 : 1) ||
+          (b.connector && (b.length !== 0 || b.layerId)) ||
           b.radius < 0 ||
           b.radius > 64 ||
           b.radiusEnd < 0 ||
@@ -304,6 +313,25 @@
           }
           chain.add(parent);
           parent = byId[parent].parent;
+        }
+      });
+      rig.bones.forEach(function (b) {
+        if (!b.deformSource) {
+          return;
+        }
+        var parent = b.parent,
+          seen = new Set(),
+          found = false;
+        while (parent && !seen.has(parent)) {
+          seen.add(parent);
+          if (parent === b.deformSource) {
+            found = true;
+          }
+          var p = byId[parent];
+          parent = p && p.parent;
+        }
+        if (!found) {
+          throw new Error("A split joint must bend its own ancestor artwork.");
         }
       });
       var checkPose = function (map) {
@@ -803,10 +831,10 @@
       // the shin pivot, rather than silently pinning the hip.
       return children.length === 1 ? children[0] : null;
     },
-    pickJoint: function (rig, world, point) {
+    pickJoint: function (rig, world, point, preferred) {
       var best = null;
       rig.bones.forEach(function (b) {
-        ["end", "start"].forEach(function (kind) {
+        (b.connector ? ["start"] : ["end", "start"]).forEach(function (kind) {
           var distance = Math.hypot(
             world[b.id][kind].x - point.x,
             world[b.id][kind].y - point.y
@@ -815,6 +843,14 @@
             !best ||
             distance < best.distance - 1e-6 ||
             (Math.abs(distance - best.distance) <= 1e-6 &&
+              (b.connector ||
+                rig.bones.find(function (v) {
+                  return v.id === best.id;
+                }).connector) &&
+              b.id === preferred &&
+              best.id !== preferred) ||
+            (Math.abs(distance - best.distance) <= 1e-6 &&
+              best.id !== preferred &&
               kind === "end" &&
               best.kind === "start")
           ) {
@@ -853,7 +889,100 @@
           layerId: null
         };
       rig.bones.push(bone);
+      rig.empty = false;
       return bone;
+    },
+    nearestSegment: function (rig, point) {
+      var world = this.world(rig, null),
+        best = null;
+      rig.bones.forEach(function (b) {
+        if (b.connector) {
+          return;
+        }
+        var w = world[b.id],
+          dx = w.end.x - w.start.x,
+          dy = w.end.y - w.start.y,
+          t = Math.max(
+            0,
+            Math.min(
+              1,
+              ((point.x - w.start.x) * dx + (point.y - w.start.y) * dy) /
+                (dx * dx + dy * dy)
+            )
+          ),
+          p = { x: w.start.x + t * dx, y: w.start.y + t * dy },
+          distance = Math.hypot(p.x - point.x, p.y - point.y);
+        if (!best || distance < best.distance) {
+          best = { id: b.id, t: t, point: p, distance: distance };
+        }
+      });
+      return best;
+    },
+    attachJoint: function (rig, parentId, start, target) {
+      var parent = rig.bones.find(function (b) {
+        return b.id === parentId;
+      });
+      if (!parent) {
+        throw new Error("Choose a segment to attach to.");
+      }
+      var world = this.world(rig, null),
+        inverse = this.inverse(world[parentId].endMatrix),
+        a = this.point(inverse, start.x, start.y),
+        b = this.point(inverse, target.x, target.y),
+        bone = this.addJoint(rig, parentId, target);
+      bone.x = a.x;
+      bone.y = a.y;
+      bone.angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+      bone.length = Math.max(1, Math.hypot(b.x - a.x, b.y - a.y));
+      return bone;
+    },
+    splitSegment: function (rig, id, t, articulation) {
+      var b = rig.bones.find(function (bone) {
+        return bone.id === id;
+      });
+      if (!b || b.length < 2 || t * b.length < 1 || (1 - t) * b.length < 1) {
+        throw new Error("Split at least one pixel from either end.");
+      }
+      if (!["hinge", "flexible"].includes(articulation)) {
+        throw new Error("Choose hinge or flexible bending.");
+      }
+      if (rig.bones.length >= 64) {
+        throw new Error("A rig supports up to 64 bones.");
+      }
+      var original = b.length,
+        children = rig.bones.filter(function (bone) {
+          return bone.parent === id;
+        }),
+        end = this.world(rig, null)[id].end,
+        child = this.addJoint(rig, id, end);
+      b.length = original * t;
+      var radius = b.radius + (b.radiusEnd - b.radius) * t;
+      child.radius = radius;
+      child.radiusEnd = b.radiusEnd;
+      child.color = b.color;
+      child.bulge = b.bulge * (1 - t);
+      b.radiusEnd = radius;
+      b.bulge *= t;
+      Object.assign(child, {
+        name: b.name + " tip",
+        angle: 0,
+        x: 0,
+        y: 0,
+        length: original - b.length,
+        deformSource: b.deformSource || id,
+        articulation: articulation
+      });
+      children.forEach(function (bone) {
+        bone.parent = child.id;
+      });
+      (rig.clips || []).forEach(function (clip) {
+        (clip.paths || []).forEach(function (path) {
+          if (path.bone === id && path.kind === "end") {
+            path.bone = child.id;
+          }
+        });
+      });
+      return child;
     },
     moveKey: function (clip, from, to) {
       if (!Number.isInteger(to) || to < 0 || to >= clip.frames) {
@@ -881,7 +1010,10 @@
         }),
         world = this.world(rig, pose),
         w = world[id],
-        parent = bone.parent ? world[bone.parent] : null;
+        parent = bone.parent ? world[bone.parent] : null,
+        parentBone = rig.bones.find(function (b) {
+          return b.id === bone.parent;
+        });
       var pin = this.jointPin(bone, pose);
       if (kind === "start" && pin) {
         return ns.ToolStateUtils.clone(pose);
@@ -909,6 +1041,7 @@
         !pin &&
         !interior &&
         parent &&
+        !parentBone.connector &&
         touching(w.start, parent.end)
       ) {
         return this.solveIK(rig, pose, id, target, bend);
@@ -949,7 +1082,7 @@
           rig.bones.find(function (b) {
             return b.id === lower.parent;
           });
-      if (!upper) {
+      if (!upper || upper.connector) {
         throw new Error(
           "Select a child bone with a parent to solve two-bone IK."
         );

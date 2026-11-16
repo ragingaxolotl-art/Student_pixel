@@ -146,6 +146,7 @@
       // A terminal limb needs a separate ancestor above its two-bone chain.
       // Never borrow the character/root bone to bend a one-piece limb.
       return b.parent &&
+        !this.bone(rig, b.parent).connector &&
         this.bone(rig, b.parent).parent &&
         !r.jointPin(b, pose) &&
         !interior &&
@@ -158,8 +159,10 @@
     },
     affected: function (rig, path) {
       var b = this.bone(rig, path.bone);
-      return path.mode === "ik" ||
-        (path.kind === "end" && b.parent && this.bone(rig, b.parent).parent)
+      return b.parent &&
+        !this.bone(rig, b.parent).connector &&
+        (path.mode === "ik" ||
+          (path.kind === "end" && b.parent && this.bone(rig, b.parent).parent))
         ? [b.id, b.parent]
         : [b.id];
     },

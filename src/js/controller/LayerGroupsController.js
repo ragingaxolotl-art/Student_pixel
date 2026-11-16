@@ -26,6 +26,8 @@
   };
   proto.init = function () {
     originalInit.apply(this, arguments);
+    $(this.layersListEl).sortable("destroy");
+    this.bindGroupDrag_();
     var bar = document.createElement("div");
     bar.className = "layer-group-bar";
     makeButton(
@@ -169,7 +171,6 @@
       this.piskelController.getWrappedPiskelController().selectLayer(selected);
     }
     originalRender.apply(this, arguments);
-    this.decorateGroups();
   };
   proto.decorateGroups = function () {
     var c = this.piskelController,
@@ -214,40 +215,10 @@
           );
           line.insertBefore(toggle, name || line.firstChild);
         }
-        row.draggable = groups.isGroup(layer);
-        row.ondragstart = function (e) {
-          if (groups.isGroup(layer)) {
-            e.dataTransfer.setData(
-              "application/x-piskel-layer",
-              groups.id(layer)
-            );
-          }
-        };
-        if (groups.isGroup(layer)) {
-          row.ondragover = function (e) {
-            e.preventDefault();
-          };
-          row.ondrop = function (e) {
-            var id = e.dataTransfer.getData("application/x-piskel-layer");
-            if (!id) {
-              return;
-            }
-            e.preventDefault();
-            e.stopPropagation();
-            var child = layers.find(function (l) {
-              return groups.state(l).groupNodeId === id;
-            });
-            if (child) {
-              try {
-                groups.assign(layers, child, layer);
-                c.getWrappedPiskelController().selectLayer(child);
-                this.groupCommit();
-              } catch (error) {
-                row.title = error.message;
-              }
-            }
-          }.bind(this);
-        }
+        var handle = row.querySelector(".layer-drag");
+        handle.draggable = true;
+        handle.title =
+          "Drag above or below a row to reorder; onto a group to nest";
       }.bind(this)
     );
     if (this.groupParentPicker) {
@@ -263,7 +234,17 @@
         .forEach(
           function (l) {
             this.groupParentPicker.append(
-              new Option(l.getName(), groups.id(l))
+              new Option(
+                groups
+                  .ancestors(layers, l)
+                  .reverse()
+                  .concat(l)
+                  .map(function (node) {
+                    return node.getName();
+                  })
+                  .join(" / "),
+                groups.id(l)
+              )
             );
           }.bind(this)
         );

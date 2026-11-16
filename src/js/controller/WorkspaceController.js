@@ -223,18 +223,21 @@
         );
       }.bind(this)
     );
-    this.column.style.left = state.tools === "left" ? "100px" : "0";
-    this.column.style.right = state.tools === "right" ? "150px" : "50px";
+    var toolsWidth =
+      this.root.style.getPropertyValue("--workspace-tools-width") || "100px";
+    this.column.style.left = state.tools === "left" ? toolsWidth : "0";
+    this.column.style.right =
+      state.tools === "right" ? "calc(50px + " + toolsWidth + ")" : "50px";
     var bleed = this.docks[state.tools].root.classList.contains(
       "workspace-side-empty"
     );
     this.center.style.setProperty(
       "--workspace-bleed-left",
-      bleed && state.tools === "left" ? "100px" : "0px"
+      bleed && state.tools === "left" ? toolsWidth : "0px"
     );
     this.center.style.setProperty(
       "--workspace-bleed-right",
-      bleed && state.tools === "right" ? "100px" : "0px"
+      bleed && state.tools === "right" ? toolsWidth : "0px"
     );
     var rect = this.root.getBoundingClientRect();
     var tools = this.panels.tools;
@@ -251,6 +254,9 @@
       "px";
     this.root.classList.toggle("workspace-compact", compact);
     this.positionTabs();
+    if (pskl.app.workspaceSizeController) {
+      pskl.app.workspaceSizeController.position_();
+    }
   };
   proto.positionTabs = function () {
     if (pskl.app.layersListController) {

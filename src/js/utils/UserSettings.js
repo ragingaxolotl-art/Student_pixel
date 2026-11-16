@@ -23,6 +23,8 @@
     RESIZE_SETTINGS: "RESIZE_SETTINGS",
     COLOR_FORMAT: "COLOR_FORMAT",
     TRANSFORM_SHOW_MORE: "TRANSFORM_SHOW_MORE",
+    DITHER_SETTINGS: "DITHER_SETTINGS",
+    WORKSPACE_LAYOUT: "WORKSPACE_LAYOUT",
     PREFERENCES_TAB: "PREFERENCES_TAB",
     KEY_TO_DEFAULT_VALUE_MAP_: {
       GRID_COLOR: Constants.TRANSPARENT_COLOR,
@@ -53,6 +55,15 @@
       },
       COLOR_FORMAT: "hex",
       TRANSFORM_SHOW_MORE: false,
+      DITHER_SETTINGS: {
+        pattern: "checker",
+        coverage: "50",
+        scale: "1",
+        colors: "both",
+        mode: "pattern",
+        density: 50
+      },
+      WORKSPACE_LAYOUT: {},
       PREFERENCES_TAB: "misc"
     },
 

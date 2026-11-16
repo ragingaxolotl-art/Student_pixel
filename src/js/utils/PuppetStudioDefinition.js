@@ -4,7 +4,7 @@ pskl.utils.PuppetStudioDefinition = {
   group: "Animate",
   detail: "Layer pivots, bone templates, IK, poses and animation clips",
   description:
-    "Preview edits before saving. Bind one source layer per bone, or use original procedural skins. Parent transforms carry children. Drag joint squares in the preview to pose with IK or edit rest geometry. Baking keeps source pixels, hides bound input layers and creates protected output by body group; Remove rig output restores input visibility.",
+    "Preview edits before saving. Bind one source layer per bone, or use original procedural skins. Parent transforms carry children. Drag joint squares in the preview to pose with IK or edit rest geometry. Baking keeps source pixels, hides bound input layers and creates protected output in the source layer order; Remove rig output restores input visibility.",
   fields: [
     {
       key: "template",
@@ -66,7 +66,7 @@ pskl.utils.PuppetStudioDefinition = {
       key: "length",
       label: "Bone length",
       value: 8,
-      min: 1,
+      min: 0,
       max: 4096,
       step: "any"
     },

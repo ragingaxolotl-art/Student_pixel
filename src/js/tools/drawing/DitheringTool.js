@@ -31,6 +31,9 @@
   ) {
     this.previousCol = col;
     this.previousRow = row;
+    this.ditherSettings_ = pskl.utils.DitherPatterns.normalize(
+      pskl.UserSettings.get(pskl.UserSettings.DITHER_SETTINGS)
+    );
 
     var penSize = pskl.app.penSizeService.getPenSize();
     var points = pskl.PixelUtils.resizePixel(col, row, penSize);
@@ -48,7 +51,15 @@
     overlay,
     event
   ) {
-    var usePrimaryColor = (col + row) % 2;
+    var settings =
+      this.ditherSettings_ ||
+      pskl.utils.DitherPatterns.normalize(
+        pskl.UserSettings.get(pskl.UserSettings.DITHER_SETTINGS)
+      );
+    var usePrimaryColor = pskl.utils.DitherPatterns.sample(col, row, settings);
+    if (!usePrimaryColor && settings.colors === "primary") {
+      return;
+    }
 
     if (pskl.app.mouseStateService.isRightButtonPressed()) {
       usePrimaryColor = !usePrimaryColor;

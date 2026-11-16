@@ -325,10 +325,10 @@
 
   ns.PiskelController.prototype.duplicateCurrentLayer = function () {
     var layer = this.getCurrentLayer();
-    var clone = pskl.utils.LayerUtils.clone(layer);
-    var currentLayerIndex = this.getCurrentLayerIndex();
-    this.piskel.addLayerAt(clone, currentLayerIndex + 1);
-    this.setCurrentLayerIndex(currentLayerIndex + 1);
+    var clone = pskl.utils.LayerGroupUtils.duplicate(this.getLayers(), layer);
+    if (clone) {
+      this.selectLayer(clone);
+    }
   };
 
   ns.PiskelController.prototype.createLayer = function (name) {

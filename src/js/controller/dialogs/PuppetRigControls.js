@@ -19,6 +19,9 @@
           ? previousHandle.kind
           : "start")
     };
+    if (this.segmentArticulation && b.articulation) {
+      this.segmentArticulation.value = b.articulation;
+    }
     var pose = r.pose(rig.workingPose[b.id]),
       p = pskl.app.piskelController.getPiskel(),
       binding =
@@ -50,6 +53,12 @@
       visible: pose.visible,
       order: pose.order
     });
+    var form = this.form("rig");
+    form.elements["rig-order"].disabled = !!b.layerId || !!b.connector;
+    form.elements["rig-order"].title =
+      "Bound artwork always follows the layer stack";
+    form.elements["rig-length"].disabled = !!b.connector;
+    form.elements["rig-binding"].disabled = !!b.connector;
     this.form("rig")
       .querySelectorAll("[data-rig-bone-id]")
       .forEach(function (button) {
@@ -157,6 +166,11 @@
       boneSelect.closest("label").after(content);
     }
     content.replaceChildren();
+    if (!rig.bones.length) {
+      var empty = document.createElement("p");
+      empty.textContent = "No joints. Choose Add joint or + Joint to start.";
+      content.append(empty);
+    }
     rig.bones.forEach(
       function (b) {
         var button = document.createElement("button"),
@@ -202,7 +216,10 @@
         return c.id === rig.activeClip;
       }),
       animate =
-        o.previewAnimation && o.editMode !== "rest" && clip && clip.keys.length;
+        o.previewAnimation &&
+        !r.isSetupMode(o.editMode) &&
+        clip &&
+        clip.keys.length;
     plan.count = animate
       ? clip.pingpong
         ? clip.frames * 2 - 2
@@ -211,19 +228,18 @@
     plan.rig = rig;
     plan.rigRenderer = renderer;
     plan.guidePose = function (index) {
-      return o.editMode === "rest" || o.editMode === "add"
+      return r.isSetupMode(o.editMode)
         ? {}
         : animate
           ? r.poseAt(rig, clip, index)
           : rig.workingPose;
     };
     plan.render = function (index) {
-      var pose =
-          o.editMode === "rest" || o.editMode === "add"
-            ? {}
-            : animate
-              ? r.poseAt(rig, clip, index)
-              : rig.workingPose,
+      var pose = r.isSetupMode(o.editMode)
+          ? {}
+          : animate
+            ? r.poseAt(rig, clip, index)
+            : rig.workingPose,
         ghosts =
           o.onion && animate
             ? [-1, 1].map(function (offset) {
@@ -294,24 +310,44 @@
         color = selected ? "#ffe600" : "#55e1df",
         x = w.end.x * sx,
         y = w.end.y * sy;
-      element("line", {
-        x1: w.start.x * sx,
-        y1: w.start.y * sy,
-        x2: x,
-        y2: y,
-        stroke: color,
-        "stroke-width": 1.25,
-        "vector-effect": "non-scaling-stroke"
+      var parentBone = plan.rig.bones.find(function (parent) {
+        return parent.id === b.parent;
       });
+      if (parentBone && parentBone.connector) {
+        var hub = world[parentBone.id];
+        element("line", {
+          x1: hub.end.x * sx,
+          y1: hub.end.y * sy,
+          x2: w.start.x * sx,
+          y2: w.start.y * sy,
+          stroke: color,
+          "stroke-width": 1.25,
+          "stroke-dasharray": "3 2",
+          "data-connector-link": b.id,
+          "vector-effect": "non-scaling-stroke"
+        });
+      }
+      if (!b.connector) {
+        element("line", {
+          x1: w.start.x * sx,
+          y1: w.start.y * sy,
+          x2: x,
+          y2: y,
+          stroke: color,
+          "stroke-width": 1.25,
+          "vector-effect": "non-scaling-stroke"
+        });
+      }
       element("circle", {
         cx: w.start.x * sx,
         cy: w.start.y * sy,
-        r: 2.5,
-        fill: pin ? "#d998ff" : color,
-        stroke: pin ? "#ffffff" : "#202020",
-        "stroke-width": pin ? 2 : 1,
+        r: b.connector ? 5 : 2.5,
+        fill: b.connector ? "#252525" : pin ? "#d998ff" : color,
+        stroke: pin ? "#ffffff" : b.connector ? color : "#202020",
+        "stroke-width": pin || b.connector ? 2 : 1,
         "data-joint-id": b.id,
-        "data-joint-locked": String(!!pin)
+        "data-joint-locked": String(!!pin),
+        "data-joint-type": b.connector ? "connector" : "joint"
       });
       if (pin) {
         element("rect", {
@@ -324,15 +360,17 @@
           "stroke-width": 1.5
         });
       }
-      element("rect", {
-        x: x - 3,
-        y: y - 3,
-        width: 6,
-        height: 6,
-        fill: "#202020",
-        stroke: color,
-        "stroke-width": 1.25
-      });
+      if (!b.connector) {
+        element("rect", {
+          x: x - 3,
+          y: y - 3,
+          width: 6,
+          height: 6,
+          fill: "#202020",
+          stroke: color,
+          "stroke-width": 1.25
+        });
+      }
       if (plan.options.labels) {
         var left = x < width * 0.45,
           text = element("text", {
@@ -448,20 +486,64 @@
               o.previewAnimation && clip && clip.keys.length
                 ? r.poseAt(rig, clip, shownFrame)
                 : rig.workingPose,
-            pose =
-              o.editMode === "rest" || o.editMode === "add" ? {} : shownPose,
+            pose = r.isSetupMode(o.editMode) ? {} : shownPose,
             world = r.world(rig, pose),
             point = coordinate(event, canvas),
             best = null;
-          best = r.pickJoint(rig, world, point);
-          if (o.editMode === "add") {
+          best = r.pickJoint(rig, world, point, o.bone);
+          if (this.handleConnectorPointer_(event, canvas, rig, o, point)) {
+            return;
+          }
+          if (o.editMode === "add" || o.editMode === "split") {
+            var segment = r.nearestSegment(rig, point),
+              tolerance = Math.max(1, (7 * canvas.width) / canvas.clientWidth);
+            if (
+              segment &&
+              segment.distance <= tolerance &&
+              segment.t > 0.02 &&
+              segment.t < 0.98
+            ) {
+              if (o.editMode === "split") {
+                var split = r.splitSegment(
+                  rig,
+                  segment.id,
+                  segment.t,
+                  this.segmentArticulation.value
+                );
+                this.savePuppetDraft(rig, split.id).catch(function (error) {
+                  form.querySelector('[role="status"]').textContent =
+                    error.message;
+                });
+                return;
+              }
+              event.preventDefault();
+              owner.stopPreview_();
+              owner.wrapper.setPointerCapture(event.pointerId);
+              this.rigAttach = {
+                parent: segment.id,
+                start: segment.point,
+                point: point,
+                canvas: canvas,
+                rig: rig
+              };
+              form.querySelector('[role="status"]').textContent =
+                "Drag to the new joint endpoint. Parent artwork stays solid.";
+              return;
+            }
+            if (o.editMode === "split") {
+              form.querySelector('[role="status"]').textContent =
+                "Click inside a segment to split it. Choose Hinge or Flexible.";
+              return;
+            }
             if (best && best.distance <= Math.max(2.5, canvas.width * 0.025)) {
               this.loadRigBone(best.id, rig, best.kind);
               owner.queueWorkspacePreview_();
               return;
             }
             var added = r.addJoint(rig, o.bone, point);
-            this.savePuppetDraft(rig, added.id);
+            this.savePuppetDraft(rig, added.id).catch(function (error) {
+              form.querySelector('[role="status"]').textContent = error.message;
+            });
             return;
           }
           if (!best || best.distance > Math.max(2.5, canvas.width * 0.025)) {
@@ -475,7 +557,9 @@
             this.refreshPuppet();
           }
           if (
-            (o.editMode === "rest" || o.editMode === "add") &&
+            (o.editMode === "rest" ||
+              o.editMode === "add" ||
+              o.editMode === "split") &&
             r.jointPin(
               rig.bones.find(function (b) {
                 return b.id === best.id;
@@ -513,6 +597,22 @@
       owner.wrapper,
       "pointermove",
       function (event) {
+        if (this.rigAttach) {
+          var attach = this.rigAttach,
+            target = coordinate(event, attach.canvas);
+          this.rigDragDraft = clone(attach.rig);
+          var bone = r.attachJoint(
+            this.rigDragDraft,
+            attach.parent,
+            attach.start,
+            target
+          );
+          attach.target = target;
+          attach.selected = bone.id;
+          this.loadRigBone(bone.id, this.rigDragDraft);
+          owner.queueWorkspacePreview_();
+          return;
+        }
         var drag = this.rigDrag;
         if (!drag) {
           return;
@@ -560,6 +660,29 @@
       }.bind(this)
     );
     var finish = function (event) {
+      if (this.rigAttach) {
+        var attach = this.rigAttach;
+        this.rigAttach = null;
+        if (
+          event.type === "pointercancel" ||
+          !attach.target ||
+          Math.hypot(
+            attach.target.x - attach.start.x,
+            attach.target.y - attach.start.y
+          ) < 1
+        ) {
+          this.rigDragDraft = null;
+          this.refreshRig(true, attach.parent);
+          owner.refreshWorkspacePreview_();
+          return;
+        }
+        this.savePuppetDraft(this.rigDragDraft, attach.selected).catch(
+          function (error) {
+            form.querySelector('[role="status"]').textContent = error.message;
+          }
+        );
+        return;
+      }
       var drag = this.rigDrag;
       if (!drag) {
         return;

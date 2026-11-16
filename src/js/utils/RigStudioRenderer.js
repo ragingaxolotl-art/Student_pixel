@@ -9,16 +9,10 @@
     this.width = project.getWidth();
     this.height = project.getHeight();
     this.partCache = new Map();
-    var groups = new Set(
-      rig.bones
-        .filter(function (b) {
-          return b.layerId || rig.skin;
-        })
-        .map(function (b) {
-          return b.group;
-        })
-    );
-    if (this.width * this.height * Math.max(1, groups.size) > 4194304) {
+    var groups = this.stack({}).filter(function (entry) {
+      return entry.kind === "group";
+    });
+    if (this.width * this.height * Math.max(1, groups.length) > 4194304) {
       throw new Error(
         "Rig preview exceeds four million group pixels; use a smaller canvas or fewer groups."
       );
@@ -154,10 +148,12 @@
     this.partCache.set(layer, frame);
     return frame;
   };
-  ns.RigStudioRenderer.prototype.opacity = function (layer) {
+  ns.RigStudioRenderer.prototype.opacity = function (layer, local) {
     var saved = this.project.toolState.rigVisibility || [],
       chain = [layer].concat(
-        ns.LayerGroupUtils.ancestors(this.project.getLayers(), layer)
+        local
+          ? []
+          : ns.LayerGroupUtils.ancestors(this.project.getLayers(), layer)
       );
     return chain.reduce(function (value, part) {
       if (part.rowState.hidden) {
@@ -242,7 +238,15 @@
       }
     }
   };
-  ns.RigStudioRenderer.prototype.groups = function (pose) {
+  ns.RigStudioRenderer.prototype.outputKey = function (bone, part) {
+    return part
+      ? "source:" +
+          (part.toolState.groupNodeId ||
+            part.toolState.id ||
+            this.project.getLayers().indexOf(part))
+      : "skin:" + bone.group;
+  };
+  ns.RigStudioRenderer.prototype.groups = function (pose, local) {
     var world = r.world(this.rig, pose),
       groups = new Map(),
       bones = this.rig.bones.slice().sort(function (a, b) {
@@ -251,44 +255,49 @@
     bones.forEach(
       function (bone) {
         var source = this.source(bone);
-        if (!source && !this.rig.skin) {
+        if (bone.connector || (!source && !this.rig.skin)) {
           return;
         }
-        if (!groups.has(bone.group)) {
-          groups.set(bone.group, new pskl.model.Frame(this.width, this.height));
-        }
-        if (!world[bone.id].visible) {
-          return;
-        }
-        var target = groups.get(bone.group),
-          w = world[bone.id];
+        var w = world[bone.id];
         if (source) {
           var index = this.rig.referenceFrame - 1;
-          var delta = r.multiply(
-            w.matrix,
-            r.inverse(this.rest[bone.id].matrix)
-          );
           this.sources(bone).forEach(
             function (part) {
+              var key = this.outputKey(bone, part);
+              if (!groups.has(key)) {
+                groups.set(key, new pskl.model.Frame(this.width, this.height));
+              }
+              if (!w.visible) {
+                return;
+              }
               if (!part.getFrameAt(index)) {
                 throw new Error("Choose an existing reference frame.");
               }
               this.merge(
-                target,
-                this.affine(
+                groups.get(key),
+                ns.RigSegmentDeform.render(
+                  this,
                   this.partFrame(part, index),
-                  delta,
-                  this.opacity(part)
+                  bone,
+                  world,
+                  this.opacity(part, local)
                 )
               );
             }.bind(this)
           );
         } else {
+          var key = this.outputKey(bone, null);
+          if (!groups.has(key)) {
+            groups.set(key, new pskl.model.Frame(this.width, this.height));
+          }
+          if (!w.visible) {
+            return;
+          }
           var scale = Math.sqrt(
             Math.abs(w.matrix[0] * w.matrix[3] - w.matrix[1] * w.matrix[2])
           );
           this.capsule(
-            target,
+            groups.get(key),
             w.start,
             w.end,
             bone.radius * scale,
@@ -316,10 +325,13 @@
     return groups;
   };
   ns.RigStudioRenderer.prototype.frame = function (pose) {
-    var out = new pskl.model.Frame(this.width, this.height);
-    this.groups(pose).forEach(
-      function (frame) {
-        this.merge(out, frame);
+    var out = new pskl.model.Frame(this.width, this.height),
+      groups = this.groups(pose);
+    this.stack(pose).forEach(
+      function (entry) {
+        if (entry.kind === "group" && groups.has(entry.name)) {
+          this.merge(out, groups.get(entry.name));
+        }
       }.bind(this)
     );
     return out;
@@ -338,28 +350,35 @@
     this.rig.bones.forEach(
       function (b) {
         var source = this.source(b);
-        if (!source && !this.rig.skin) {
+        if (b.connector || (!source && !this.rig.skin)) {
           return;
         }
-        var index = source ? layers.indexOf(source) : layers.length;
         if (source) {
           bound.add(source);
           this.sources(b).forEach(function (part) {
             bound.add(part);
           });
         }
-        var group = groups.get(b.group) || {
-          kind: "group",
-          name: b.group,
-          anchor: -1,
-          order: 0
-        };
-        group.anchor = Math.max(group.anchor, index);
-        var order = r.pose(pose[b.id]).order;
-        if (Math.abs(order) > Math.abs(group.order)) {
-          group.order = order;
-        }
-        groups.set(b.group, group);
+        (source ? this.sources(b) : [null]).forEach(
+          function (part) {
+            var key = this.outputKey(b, part),
+              index = part ? layers.indexOf(part) : layers.length;
+            var group = groups.get(key) || {
+              kind: "group",
+              name: key,
+              label: part ? part.getName() : b.group,
+              source: part,
+              index: index,
+              anchor: index,
+              order: 0
+            };
+            var order = part ? 0 : r.pose(pose[b.id]).order;
+            if (Math.abs(order) > Math.abs(group.order)) {
+              group.order = order;
+            }
+            groups.set(key, group);
+          }.bind(this)
+        );
       }.bind(this)
     );
     var entries = layers.map(function (layer, index) {
@@ -385,6 +404,13 @@
     });
   };
   ns.RigStudioRenderer.prototype.scene = function (pose, current, ghosts) {
+    if (!this.rig.bones.length) {
+      return ns.LayerUtils.flattenFrameAt(
+        this.project.getLayers(),
+        current,
+        true
+      );
+    }
     var canvas = ns.CanvasUtils.createCanvas(this.width, this.height),
       ctx = canvas.getContext("2d"),
       groups = this.groups(pose);

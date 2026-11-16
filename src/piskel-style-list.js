@@ -8,6 +8,7 @@ exports.styles = [
   "css/style.css",
   "css/animations.css",
   "css/layout.css",
+  "css/dither-options.css",
   "css/font-icon.css",
   "css/forms.css",
   "css/settings.css",
@@ -46,5 +47,6 @@ exports.styles = [
   "css/widgets-size-picker.css",
   "css/widgets-tabs.css",
   "css/widgets-wizard.css",
-  "css/workspace.css"
+  "css/workspace.css",
+  "css/workspace-sizing.css"
 ];

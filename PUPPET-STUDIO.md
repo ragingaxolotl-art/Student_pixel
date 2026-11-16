@@ -10,7 +10,17 @@ The window follows the supplied sketch: Rig/Poses/Clips menus at the top left, t
 
 ## Rig your character
 
-Fit bones adjusts pivots and lengths. Pose moves limbs without stretching bone lengths. Add joint extends the selected parent when you click an empty location on the character; click an existing handle to choose a parent. Add/remove joints is also available in the hierarchy. Parent bone builds nested branches.
+Fit bones adjusts pivots and lengths. Pose moves limbs without stretching bone lengths. Add joint extends the selected parent when you click empty space; click an existing handle to choose a parent. To attach a branch inside any segment, choose Add joint and drag from the segment to the new branch tip. The parent stays one solid piece: a spine can attach in the middle of a pelvis, a stem can attach inside a leaf, or a branch can attach anywhere on a wing. Moving the attached branch rotates that branch without dividing its parent artwork. Add/remove joints is also available in the hierarchy.
+
+Split segment is separate. Choose Hinge or Flexible in Bending, then click inside a segment, at least one sprite pixel from either end. Hinge gives a sharp articulated bend; Flexible blends the bend around the joint in the existing bound artwork. Both keep the original image and layer intact. Existing children are reparented without changing their rest or saved-pose positions. Select an inserted joint to change its bending style. Removing that joint rejoins the segment. Use Pose to bend it and lock its pivot when the adjacent piece should stay in place. Large canvases with many splits are limited to keep the preview responsive. Source parts still need to be on separate layers for independent branches. Parent bone builds nested branches.
+
+Use **Connector** to put a shoulder or pelvis attachment on any body segment. Then select **Attach limb** and click the segment for each attached arm, leg, or other branch. The hollow ring marks a connector; dashed links show its attachments. Attaching keeps rest and saved pose positions unchanged. Moving or tilting the body carries its attached branches. Each limb still bends independently; its IK and tip motion paths stop at the connector instead of rotating the body.
+
+**Clear joints** removes the skeleton, saved poses, joint paths and clip pose markers. It keeps artwork layers and walking guides. Undo restores the rig. Use **+ Joint** to start again. This is separate from removing generated animation layers.
+
+The main editor's **layer order always controls which artwork is in front**. Bone hierarchy controls movement. Assigning a layer to a bone changes its binding without moving or reordering the layer. Bound parts ignore the old pose draw-order field; use the layer list to change their stacking. Generated artwork stays at each source layer's position and keeps its parent group, including group visibility and opacity.
+
+Ctrl/Cmd+Z and Undo work throughout Puppet Studio. Ctrl/Cmd+Shift+Z, Ctrl+Y and Redo restore edits. Unsaved numeric/property edits undo before committed project edits. A pending joint-path draft keeps its own undo/redo until Apply or Cancel. Saved rig changes, joint gestures, attachments, splits and generated frames use project history.
 
 Lock joint pins the selected pivot in the current pose. Double-click a pivot circle to toggle it; purple square outlines identify pinned joints. Bones can rotate around pinned pivots. Source layers & groups lets you assign existing artwork to a joint. A group binding moves its descendants, except parts assigned individually to other bones. Main-page groups still support nesting, collapse, inherited visibility/opacity/locks, and moving a branch together.
 

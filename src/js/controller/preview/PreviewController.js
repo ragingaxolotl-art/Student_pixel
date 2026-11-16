@@ -137,8 +137,8 @@
    */
   ns.PreviewController.prototype.calculateZoom_ = function () {
     var frame = this.piskelController.getCurrentFrame();
-    var hZoom = PREVIEW_SIZE / frame.getHeight();
-    var wZoom = PREVIEW_SIZE / frame.getWidth();
+    var hZoom = (this.viewportHeight || PREVIEW_SIZE) / frame.getHeight();
+    var wZoom = (this.viewportWidth || PREVIEW_SIZE) / frame.getWidth();
 
     return Math.min(hZoom, wZoom);
   };
@@ -156,8 +156,8 @@
     var height;
 
     if (isSeamless) {
-      height = PREVIEW_SIZE;
-      width = PREVIEW_SIZE;
+      height = this.viewportHeight || PREVIEW_SIZE;
+      width = this.viewportWidth || PREVIEW_SIZE;
     } else {
       var zoom = this.getZoom();
       var frame = this.piskelController.getCurrentFrame();
@@ -169,13 +169,24 @@
     containerEl.style.height = height + "px";
     containerEl.style.width = width + "px";
 
-    var horizontalMargin = (PREVIEW_SIZE - height) / 2;
+    var horizontalMargin = ((this.viewportHeight || PREVIEW_SIZE) - height) / 2;
     containerEl.style.marginTop = horizontalMargin + "px";
     containerEl.style.marginBottom = horizontalMargin + "px";
 
-    var verticalMargin = (PREVIEW_SIZE - width) / 2;
+    var verticalMargin = ((this.viewportWidth || PREVIEW_SIZE) - width) / 2;
     containerEl.style.marginLeft = verticalMargin + "px";
     containerEl.style.marginRight = verticalMargin + "px";
+  };
+
+  ns.PreviewController.prototype.setViewportSize = function (width, height) {
+    this.viewportWidth = width;
+    this.viewportHeight = height;
+    this.previewActionsController.updatePreviewSizeButtons_();
+    this.updateZoom_();
+    this.updateContainerDimensions_();
+    if (pskl.app.minimapController) {
+      pskl.app.minimapController.renderMinimap_();
+    }
   };
 
   ns.PreviewController.prototype.setRenderFlag_ = function (bool) {

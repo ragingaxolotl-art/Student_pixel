@@ -10,6 +10,9 @@
     var result = cloneLayer.apply(this, arguments);
     if (g.state(result)) {
       g.state(result).groupNodeId = pskl.utils.Uuid.generate();
+      if (g.state(result).id) {
+        g.state(result).id = pskl.utils.Uuid.generate();
+      }
     }
     return result;
   };

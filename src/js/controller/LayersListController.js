@@ -135,7 +135,8 @@
   };
   proto.renderLayerList_ = function () {
     var c = this.piskelController,
-      scroll = this.layersListEl.scrollTop;
+      scroll = this.layersListEl.scrollTop,
+      horizontalScroll = this.layersListEl.scrollLeft;
     this.layersListEl.replaceChildren();
     c.getLayers().forEach(
       function (layer, index) {
@@ -275,15 +276,43 @@
         this.layersListEl.prepend(row);
       }.bind(this)
     );
+    if (this.decorateGroups) {
+      this.decorateGroups();
+    }
     this.layersListEl.scrollTop = scroll;
+    this.layersListEl.scrollLeft = horizontalScroll;
     var selected = this.layersListEl.querySelector(".current-layer-item");
-    if (selected && this.lastSelectedLayer !== c.getCurrentLayer()) {
-      selected.scrollIntoView({ block: "nearest" });
+    var currentLayer = c.getCurrentLayer(),
+      selectionKey =
+        currentLayer.rowState.groupNodeId || currentLayer.rowState.id;
+    if (
+      selected &&
+      (!this.lastSelectedLayer || this.lastSelectedLayerKey !== selectionKey)
+    ) {
+      this.scrollWithin_(this.layersListEl, selected);
     }
     this.lastSelectedLayer = c.getCurrentLayer();
+    this.lastSelectedLayerKey = selectionKey;
     if (this.panelKind) {
       this.refreshPane();
     }
+  };
+  proto.scrollWithin_ = function (container, node) {
+    if (!node || !node.getClientRects().length) {
+      return;
+    }
+    var view = container.getBoundingClientRect(),
+      rect = node.getBoundingClientRect();
+    var top = view.top + container.clientTop,
+      bottom = top + container.clientHeight;
+    if (rect.height > container.clientHeight || rect.top < top) {
+      container.scrollTop += rect.top - top;
+    } else if (rect.bottom > bottom) {
+      container.scrollTop += rect.bottom - bottom;
+    }
+  };
+  proto.revealPane_ = function () {
+    this.scrollWithin_(this.pane.closest(".right-panels-scroller"), this.pane);
   };
   proto.onClick_ = function (e) {
     var button = e.target.closest("button"),
@@ -377,7 +406,7 @@
       this.panelKind = action;
       this.requestedPreviewMode = action;
       this.refreshPane();
-      this.pane.scrollIntoView({ block: "nearest" });
+      this.revealPane_();
     }
   };
   proto.rename = function (index) {
@@ -423,6 +452,9 @@
       layer = c.getCurrentLayer(),
       pane = this.pane,
       old = {};
+    var scroller = pane.closest(".right-panels-scroller"),
+      scroll = scroller.scrollTop,
+      innerScroll = pane.scrollTop;
     pane.querySelectorAll("[data-option]").forEach(function (n) {
       old[n.dataset.option] = n.type === "checkbox" ? n.checked : n.value;
     });
@@ -651,6 +683,8 @@
       }.bind(this)
     );
     this.preview();
+    scroller.scrollTop = scroll;
+    pane.scrollTop = innerScroll;
   };
   proto.options = function () {
     var values = {};
@@ -901,9 +935,11 @@
               return marker.dataset.effectId === reveal;
             })
             .slice(-1)
-            .forEach(function (marker) {
-              marker.scrollIntoView({ block: "nearest" });
-            });
+            .forEach(
+              function (marker) {
+                this.scrollWithin_(this.layersListEl, marker);
+              }.bind(this)
+            );
         }
         return;
       }
@@ -960,7 +996,7 @@
     this.panelKind = "fx";
     this.requestedPreviewMode = "fx";
     this.refreshPane();
-    this.pane.scrollIntoView({ block: "nearest" });
+    this.revealPane_();
   };
   proto.closePreview = function () {
     this.panelKind = null;
@@ -1015,7 +1051,7 @@
             this.panelKind = item[0];
             this.requestedPreviewMode = item[0];
             this.refreshPane();
-            this.pane.scrollIntoView({ block: "nearest" });
+            this.revealPane_();
           } else {
             this.setPreviewMode(item[0]);
             this.preview();

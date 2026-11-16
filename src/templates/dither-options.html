@@ -1,0 +1,80 @@
+<div
+  id="dither-options"
+  class="dither-options"
+  hidden
+  aria-label="Dither options"
+>
+  <button
+    type="button"
+    class="dither-compact"
+    aria-expanded="false"
+    aria-controls="dither-controls"
+  >
+    Dither options ▾
+  </button>
+  <div id="dither-controls" class="dither-controls">
+    <label class="dither-field dither-pattern-field"
+      ><span>Pattern</span
+      ><button
+        type="button"
+        class="dither-pattern-trigger"
+        aria-label="Dither pattern"
+        aria-haspopup="dialog"
+        aria-controls="dither-pattern-menu"
+        aria-expanded="false"
+      >
+        <canvas width="16" height="8" aria-hidden="true"></canvas
+        ><span aria-hidden="true">▾</span>
+      </button></label
+    >
+    <div class="dither-field dither-density-field">
+      <button
+        type="button"
+        class="dither-density-mode"
+        aria-label="Use adjustable dither density"
+        aria-pressed="false"
+        title="Adjustable ordered density replaces the pattern. Choose a pattern to switch back."
+      >
+        Density
+      </button>
+      <div class="dither-density-control">
+        <input
+          type="range"
+          id="dither-density"
+          min="0"
+          max="100"
+          step="1"
+          value="50"
+          data-dither-setting="density"
+          aria-label="Dither density"
+          title="Primary color density (0–100%). Overrides the selected pattern."
+        >
+        <output for="dither-density" class="dither-density-value">50%</output>
+      </div>
+    </div>
+    <label class="dither-field dither-scale-field"
+      >Scale<select
+        data-dither-setting="scale"
+        aria-label="Dither pattern scale"
+      >
+        <option value="1">1 px</option>
+        <option value="2">2 px</option>
+        <option value="4">4 px</option>
+      </select></label
+    >
+    <label class="dither-field dither-colors-field"
+      >Colors<select data-dither-setting="colors" aria-label="Dither colors">
+        <option value="both">Both colors</option>
+        <option value="primary">Primary only</option>
+      </select></label
+    >
+  </div>
+  <div
+    id="dither-pattern-menu"
+    class="dither-pattern-menu"
+    hidden
+    role="dialog"
+    aria-label="Choose dither pattern"
+  ></div>
+  <span class="dither-announcement" role="status" aria-live="polite"></span>
+</div>

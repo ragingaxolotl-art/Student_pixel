@@ -211,6 +211,10 @@
       this.penSizeController = new pskl.controller.PenSizeController();
       this.penSizeController.init();
 
+      this.ditherOptionsController =
+        new pskl.controller.DitherOptionsController();
+      this.ditherOptionsController.init();
+
       this.fileDropperService = new pskl.service.FileDropperService(
         this.piskelController
       );
@@ -235,6 +239,9 @@
 
       this.workspaceController = new pskl.controller.WorkspaceController();
       this.workspaceController.init();
+      this.workspaceSizeController =
+        new pskl.controller.WorkspaceSizeController();
+      this.workspaceSizeController.init();
 
       this.drawingLoop = new pskl.rendering.DrawingLoop();
       this.drawingLoop.addCallback(this.render, this);

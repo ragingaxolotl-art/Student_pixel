@@ -114,6 +114,10 @@
   };
 
   ns.DialogsController.prototype.showDialog = function (dialogId, initArgs) {
+    if (this.isHiding_) {
+      window.clearTimeout(this.cleanupTimeout_);
+      this.cleanupDialogContainer_();
+    }
     if (this.isDisplayingDialog_()) {
       return;
     }
@@ -151,7 +155,10 @@
 
     pskl.app.shortcutService.unregisterShortcut(this.closePopupShortcut);
     this.dialogWrapper_.classList.remove("show");
-    window.setTimeout(this.cleanupDialogContainer_.bind(this), 500);
+    this.cleanupTimeout_ = window.setTimeout(
+      this.cleanupDialogContainer_.bind(this),
+      500
+    );
     this.isHiding_ = true;
   };
 

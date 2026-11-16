@@ -194,19 +194,6 @@
           this.undoJointPath(key === "y" || event.shiftKey);
           return;
         }
-        if (
-          !this.motionPathDraft &&
-          event.target === this.motionScrub &&
-          (event.metaKey || event.ctrlKey) &&
-          (key === "z" || key === "y")
-        ) {
-          event.preventDefault();
-          event.stopPropagation();
-          pskl.app.historyService[
-            key === "y" || event.shiftKey ? "redo" : "undo"
-          ]();
-          return;
-        }
         if (this.motionPathDraft && event.key === "Escape") {
           event.preventDefault();
           event.stopPropagation();
