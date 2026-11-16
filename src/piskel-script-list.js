@@ -206,6 +206,7 @@ exports.scripts = [
   "js/controller/dialogs/PuppetAnimatorControls.js",
   "js/controller/dialogs/PuppetTransformControls.js",
   "js/controller/dialogs/PuppetConnectionControls.js",
+  "js/controller/dialogs/StudioPanels.js",
   "js/controller/dialogs/DialogsController.js",
 
   // Widgets

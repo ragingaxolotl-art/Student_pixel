@@ -883,3 +883,38 @@
 .puppet-dialog [aria-label="Auto-key poses"] {
   accent-color: #ef9b68;
 }
+
+/* Keep all options reachable when the hierarchy and toolbars grow. */
+.puppet-dialog .puppet-side {
+  overflow: auto;
+}
+.puppet-dialog .puppet-options {
+  flex: 1 0 auto;
+  min-height: 160px;
+  overflow: visible;
+}
+.puppet-dialog .puppet-footer {
+  position: sticky;
+  bottom: 0;
+  background: #292929;
+  z-index: 3;
+}
+.studio-panel-handle {
+  display: block;
+  width: 100%;
+  cursor: move;
+  touch-action: none;
+  color: #ccc;
+  background: #363636;
+  border: 1px solid #555;
+  padding: 4px;
+  font:
+    11px Arial,
+    sans-serif;
+  text-align: left;
+}
+[data-studio-floating] > .studio-panel-handle {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
