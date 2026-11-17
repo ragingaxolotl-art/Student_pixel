@@ -4,6 +4,7 @@
     return [
       "rest",
       "add",
+      "root",
       "split",
       "connector",
       "connect",

@@ -141,6 +141,11 @@
       ["rest", "Fit bones", "Move pivots and change bone lengths"],
       ["select", "Select", "Select a joint without moving it"],
       [
+        "root",
+        "Add unconnected joint",
+        "Click anywhere to place an independent joint with no parent, even over another bone. Use Fit bones to adjust its length."
+      ],
+      [
         "connector",
         "Connector",
         "Click a body segment to place a shoulder or pelvis attachment"
@@ -177,6 +182,7 @@
     );
     form.elements["rig-editMode"].append(
       new Option("Add joints", "add"),
+      new Option("Add unconnected joint", "root"),
       new Option("Connector", "connector"),
       new Option("Attach limb", "connect"),
       new Option("Split segment", "split")

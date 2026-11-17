@@ -520,6 +520,23 @@
             world = r.world(rig, pose),
             point = coordinate(event, canvas),
             best = null;
+          if (o.editMode === "root") {
+            event.preventDefault();
+            owner.stopPreview_();
+            var independent = r.addJoint(rig, null, point);
+            independent.name = "Unconnected joint " + rig.bones.length;
+            independent.length = Math.max(2, Math.min(24, Math.round(canvas.width / 8)));
+            this.savePuppetDraft(rig, independent.id)
+              .then(function () {
+                form.querySelector('[role="status"]').textContent =
+                  "Unconnected joint added. It has no parent. Use Fit bones to adjust it, or Connect joints to attach it later.";
+              })
+              .catch(function (error) {
+                form.querySelector('[role="status"]').textContent =
+                  error.message;
+              });
+            return;
+          }
           best = r.pickJoint(rig, world, point, o.bone);
           if (this.handleConnectorPointer_(event, canvas, rig, o, point)) {
             return;
