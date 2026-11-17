@@ -525,7 +525,10 @@
             owner.stopPreview_();
             var independent = r.addJoint(rig, null, point);
             independent.name = "Unconnected joint " + rig.bones.length;
-            independent.length = Math.max(2, Math.min(24, Math.round(canvas.width / 8)));
+            independent.length = Math.max(
+              2,
+              Math.min(24, Math.round(canvas.width / 8))
+            );
             this.savePuppetDraft(rig, independent.id)
               .then(function () {
                 form.querySelector('[role="status"]').textContent =
