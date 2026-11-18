@@ -21,6 +21,7 @@
     EXPORT_GIF_REPEAT: "EXPORT_GIF_REPEAT",
     PEN_SIZE: "PEN_SIZE",
     BRUSH_OPACITY: "BRUSH_OPACITY",
+    BRUSH_TIP: "BRUSH_TIP",
     RESIZE_SETTINGS: "RESIZE_SETTINGS",
     COLOR_FORMAT: "COLOR_FORMAT",
     TRANSFORM_SHOW_MORE: "TRANSFORM_SHOW_MORE",
@@ -52,6 +53,7 @@
       EXPORT_GIF_REPEAT: true,
       PEN_SIZE: 1,
       BRUSH_OPACITY: 100,
+      BRUSH_TIP: "square",
       RESIZE_SETTINGS: {
         maintainRatio: true,
         resizeContent: false,

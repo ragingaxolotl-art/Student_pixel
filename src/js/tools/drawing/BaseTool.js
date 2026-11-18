@@ -82,7 +82,10 @@
     var size = this.supportsDynamicPenSize()
       ? pskl.app.penSizeService.getPenSize()
       : 1;
-    pskl.PixelUtils.resizePixel(col, row, size).forEach(function (point) {
+    var points = this.getBrushPoints
+      ? this.getBrushPoints(col, row)
+      : pskl.PixelUtils.resizePixel(col, row, size);
+    points.forEach(function (point) {
       overlay.setPixel(point[0], point[1], highlightColor);
     });
 

@@ -8,6 +8,41 @@
     Brush options ▾
   </button>
   <div id="brush-controls" class="brush-controls">
+    <div class="brush-library-group">
+      <span>Brush</span>
+      <button
+        type="button"
+        class="brush-library-trigger"
+        aria-label="Brush library"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+        aria-controls="brush-library-menu"
+      >
+        <canvas width="16" height="16" aria-hidden="true"></canvas
+        ><span class="brush-tip-name">Square</span>
+        ▾
+      </button>
+      <div
+        id="brush-library-menu"
+        class="brush-library-menu"
+        role="dialog"
+        aria-label="Brush library"
+        hidden
+      >
+        <strong>Brush library · 36 tips</strong>
+        <input
+          type="search"
+          class="brush-library-search"
+          aria-label="Search brushes"
+          placeholder="Search brushes…"
+        >
+        <p class="brush-library-empty" role="status" hidden>
+          No brushes match your search.
+        </p>
+        <div class="brush-tip-grid"></div>
+        <p>Tips use the current brush size and paint opacity.</p>
+      </div>
+    </div>
     <div class="brush-size-group">
       <span>Brush size</span>
       <div class="brush-size-row">

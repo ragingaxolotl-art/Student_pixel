@@ -48,13 +48,30 @@
     frame,
     overlay
   ) {
-    var penSize = pskl.app.penSizeService.getPenSize();
-    var points = pskl.PixelUtils.resizePixel(col, row, penSize);
+    var points = this.getBrushPoints(col, row);
     points.forEach(
       function (point) {
         this.draw(color, point[0], point[1], frame, overlay);
       }.bind(this)
     );
+  };
+
+  ns.SimplePen.prototype.getBrushPoints = function (col, row) {
+    var penSize = pskl.app.penSizeService.getPenSize();
+    var points = pskl.PixelUtils.resizePixel(col, row, penSize);
+    var tip = ["tool-pen", "tool-eraser", "tool-vertical-mirror-pen"].includes(
+      this.toolId
+    )
+      ? pskl.UserSettings.get(pskl.UserSettings.BRUSH_TIP)
+      : "square";
+    return points.filter(function (point) {
+      return pskl.controller.brushTipContains(
+        tip,
+        point[0] - col + Math.floor(penSize / 2),
+        point[1] - row + Math.floor(penSize / 2),
+        penSize
+      );
+    });
   };
 
   ns.SimplePen.prototype.draw = function (color, col, row, frame, overlay) {
