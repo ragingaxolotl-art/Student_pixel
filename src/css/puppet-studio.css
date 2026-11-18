@@ -919,7 +919,7 @@
   z-index: 5;
 }
 .puppet-tutorial-dialog {
-  width: min(1000px, 90vw);
+  width: min(1240px, 94vw);
   max-height: 90vh;
   overflow: auto;
   background: #252525;
@@ -959,4 +959,66 @@
   color: #ccc;
   font-size: 12px;
   margin: 6px 0;
+}
+
+.puppet-tutorial-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 270px;
+  gap: 16px;
+  align-items: start;
+}
+.puppet-tutorial-chapters {
+  max-height: 65vh;
+  overflow: auto;
+}
+.puppet-tutorial-chapters ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.puppet-tutorial-chapters button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #555;
+  background: #333;
+  color: #eee;
+  padding: 9px;
+  margin-bottom: 5px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.puppet-tutorial-chapters button:hover,
+.puppet-tutorial-chapters button:focus-visible {
+  border-color: #ffe600;
+}
+.puppet-tutorial-chapters button[aria-current="true"] {
+  color: #ffe600;
+  border-color: #ffe600;
+}
+.puppet-tutorial-playback-status {
+  font-size: 12px;
+}
+@media (max-width: 760px) {
+  .puppet-tutorial-body {
+    grid-template-columns: 1fr;
+  }
+  .puppet-tutorial-chapters {
+    max-height: 240px;
+  }
+}
+
+.puppet-tutorial-header {
+  position: sticky;
+  top: -16px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #252525;
+  padding: 12px 0;
+}
+.puppet-tutorial-header h3 {
+  margin: 0;
 }

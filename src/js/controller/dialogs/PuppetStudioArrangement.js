@@ -46,13 +46,68 @@
             description:
               "Start with separate artwork layers, choose a starting frame, place independent joints, fit pivots and bone lengths, assign layers, connect an arm through a shoulder hub, test bends and locks, and save your editable rig.",
             file: "how-to-rig-bea.mp4",
+            chapters: [
+              { at: 0, title: "Start with separate layers" },
+              { at: 9.786, title: "Choose the starting frame" },
+              { at: 17.006, title: "Make a custom rig" },
+              { at: 26.466, title: "Place the body pivot" },
+              { at: 33.884, title: "Fit the body bone" },
+              { at: 45.922, title: "Name and assign the body" },
+              { at: 60.443, title: "Place a shoulder joint" },
+              { at: 69.333, title: "Assign the upper arm" },
+              { at: 79.467, title: "Add the elbow and wrist" },
+              { at: 92.422, title: "Assign the forearm" },
+              { at: 103.229, title: "Connect the arm to the body" },
+              { at: 114.036, title: "Test the connection" },
+              { at: 124.994, title: "Test the elbow bend" },
+              { at: 137.938, title: "Pins, knees and flexible parts" },
+              { at: 153.689, title: "Save and continue" }
+            ],
             duration: "2:50"
+          },
+          {
+            title: "Joints & Layers",
+            description:
+              "Compare bound and unbound artwork, assign source layers to bones, fit pivots and endpoints, change parents without moving the artwork or reordering layers, adjust pose transforms and locks, and save/reopen your Piskel project. Includes step-by-step demonstrations.",
+            file: "joints-layers-tutorial-bea.mp4",
+            duration: "4:13",
+            chapters: [
+              { at: 0, title: "Setup versus posing" },
+              { at: 16.544, title: "Select and name a joint" },
+              { at: 34.434, title: "What happens with no layer assigned" },
+              { at: 53.254, title: "Assign the correct artwork layer" },
+              { at: 71.472, title: "Fit the pivot and endpoint" },
+              { at: 97.28, title: "Change the parent without a jump" },
+              { at: 121.115, title: "Use the source layer list" },
+              { at: 143.543, title: "Rotation and position in a pose" },
+              { at: 164.246, title: "Scale and shear the artwork" },
+              { at: 186.709, title: "Visibility and pose locks" },
+              { at: 208.094, title: "Save the editable project" },
+              { at: 229.673, title: "Reopen and check your assignments" }
+            ]
           },
           {
             title: "Joint motion paths and settings",
             description:
               "Guide a hand or foot between two pose keys. Draw and edit a path, scrub the in-between frames, recognize limited reach, adjust easing and Hold, edit saved paths, and save or generate the animation.",
             file: "joint-motion-path-tutorial-bea.mp4",
+            chapters: [
+              { at: 0, title: "What a motion path does" },
+              { at: 16.022, title: "Prepare two neighboring poses" },
+              { at: 32.704, title: "Select the joint" },
+              { at: 44.766, title: "From and To settings" },
+              { at: 62.794, title: "Joint target setting" },
+              { at: 82.007, title: "Draw the route" },
+              { at: 96.939, title: "Edit the control points" },
+              { at: 113.4, title: "Preview individual frames" },
+              { at: 130.106, title: "Orange means limited reach" },
+              { at: 150.166, title: "Apply versus Cancel" },
+              { at: 167.3, title: "Playback speed" },
+              { at: 183.843, title: "Easing and Hold" },
+              { at: 210.451, title: "Edit and remove a saved path" },
+              { at: 230.847, title: "Locks and good workflow" },
+              { at: 251.873, title: "Save the result" }
+            ],
             duration: "4:35"
           },
           {
@@ -60,6 +115,13 @@
             description:
               "Place a pelvis connector on the body and attach both legs. Moving the body carries the limbs while each leg can still bend independently.",
             file: "pelvis-connector.mp4",
+            chapters: [
+              { at: 0, title: "Choose the body" },
+              { at: 6.2, title: "Place the pelvis connector" },
+              { at: 13.3, title: "Attach both legs" },
+              { at: 22.2, title: "Test body movement" },
+              { at: 30.6, title: "Save the rig" }
+            ],
             duration: "0:33"
           }
         ];
@@ -82,9 +144,83 @@
         var video = document.createElement("video");
         video.controls = true;
         video.preload = "metadata";
+        var body = document.createElement("div"),
+          chapters = document.createElement("nav"),
+          chapterHeading = document.createElement("h4"),
+          chapterList = document.createElement("ol"),
+          playbackStatus = document.createElement("p"),
+          pendingChapter = null;
+        body.className = "puppet-tutorial-body";
+        chapters.className = "puppet-tutorial-chapters";
+        chapters.setAttribute("aria-label", "Tutorial chapters");
+        chapterHeading.textContent = "Jump to a section";
+        playbackStatus.setAttribute("role", "status");
+        playbackStatus.className = "puppet-tutorial-playback-status";
+        chapters.append(chapterHeading, chapterList, playbackStatus);
+        body.append(video, chapters);
+        var markChapter = function () {
+          var items = topics[Number(topic.value)].chapters,
+            current = 0;
+          items.forEach(function (item, index) {
+            if (video.currentTime >= item.at) {
+              current = index;
+            }
+          });
+          Array.from(chapterList.querySelectorAll("button")).forEach(
+            function (button, index) {
+              if (index === current) {
+                button.setAttribute("aria-current", "true");
+              } else {
+                button.removeAttribute("aria-current");
+              }
+            }
+          );
+        };
+        var jumpToChapter = function (at) {
+          if (video.readyState < 1) {
+            pendingChapter = at;
+            return;
+          }
+          video.currentTime = Math.min(at, Math.max(0, video.duration - 0.1));
+          markChapter();
+          video.play().catch(function (error) {
+            if (error.name !== "AbortError") {
+              playbackStatus.textContent = "Press Play to start this section.";
+            }
+          });
+        };
+        video.addEventListener("timeupdate", markChapter);
+        video.addEventListener("loadedmetadata", function () {
+          if (pendingChapter !== null) {
+            var at = pendingChapter;
+            pendingChapter = null;
+            jumpToChapter(at);
+          }
+        });
         var showTopic = function () {
           var item = topics[Number(topic.value)];
           video.pause();
+          pendingChapter = null;
+          playbackStatus.textContent = "";
+          chapterList.replaceChildren();
+          item.chapters.forEach(function (section) {
+            var row = document.createElement("li"),
+              button = document.createElement("button"),
+              seconds = Math.floor(section.at),
+              timestamp =
+                Math.floor(seconds / 60) +
+                ":" +
+                String(seconds % 60).padStart(2, "0");
+            button.type = "button";
+            button.textContent = timestamp + "  " + section.title;
+            button.dataset.chapterAt = section.at;
+            button.onclick = function () {
+              playbackStatus.textContent = "";
+              jumpToChapter(section.at);
+            };
+            row.append(button);
+            chapterList.append(row);
+          });
           title.textContent = item.title;
           description.textContent = item.description;
           details.textContent =
@@ -92,6 +228,7 @@
           video.setAttribute("aria-label", item.title + " video tutorial");
           video.src = new URL("tutorials/" + item.file, document.baseURI).href;
           video.load();
+          markChapter();
         };
         topic.addEventListener("change", showTopic);
         showTopic();
@@ -107,15 +244,10 @@
         dialog.addEventListener("keydown", function (event) {
           event.stopPropagation();
         });
-        dialog.append(
-          heading,
-          close,
-          topicLabel,
-          title,
-          description,
-          details,
-          video
-        );
+        var header = document.createElement("div");
+        header.className = "puppet-tutorial-header";
+        header.append(heading, close);
+        dialog.append(header, topicLabel, title, description, details, body);
         this.owner.wrapper.append(dialog);
         dialog.showModal();
       },
