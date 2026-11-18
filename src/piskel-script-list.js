@@ -299,6 +299,11 @@ exports.scripts = [
   "js/worker/imageprocessor/ImageProcessorWorker.js",
   "js/worker/imageprocessor/ImageProcessor.js",
 
+  // Shared editable asset library
+  "js/utils/AssetUtils.js",
+  "js/service/AssetLibraryService.js",
+  "js/controller/AssetLibraryController.js",
+
   // Application controller and initialization
   "js/app.js"
 ];

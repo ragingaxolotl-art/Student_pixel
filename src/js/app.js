@@ -228,6 +228,12 @@
         new pskl.controller.ShapeOptionsController();
       this.shapeOptionsController.init();
 
+      this.assetLibraryController = new pskl.controller.AssetLibraryController(
+        this.piskelController
+      );
+      this.assetLibraryService = this.assetLibraryController.service;
+      this.assetLibraryController.init();
+
       this.fileDropperService = new pskl.service.FileDropperService(
         this.piskelController
       );

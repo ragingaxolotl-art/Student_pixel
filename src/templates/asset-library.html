@@ -1,0 +1,215 @@
+<section
+  id="asset-library"
+  class="asset-library"
+  aria-label="Asset Library"
+  hidden
+>
+  <div class="asset-title">
+    <button type="button" class="asset-drag" aria-label="Move Asset Library">
+      ⠿ Asset Library
+    </button><button
+      type="button"
+      data-asset-action="close"
+      aria-label="Close Asset Library"
+    >
+      ×
+    </button>
+  </div>
+  <div class="asset-toolbar">
+    <button type="button" data-asset-action="capture">Save as asset</button
+    ><button type="button" data-asset-action="return" hidden>
+      Return to project
+    </button>
+  </div>
+  <input
+    class="asset-search"
+    type="search"
+    aria-label="Search assets"
+    placeholder="Search your assets…"
+  >
+  <div class="asset-tabs" role="group" aria-label="Asset library location">
+    <button type="button" data-asset-scope="library" aria-pressed="true">
+      My library
+    </button><button
+      type="button"
+      data-asset-scope="project"
+      aria-pressed="false"
+    >
+      In this project
+    </button>
+  </div>
+  <div class="asset-grid"></div>
+  <p class="asset-empty">Save your artwork or import an asset pack.</p>
+  <div class="asset-detail">
+    <canvas width="96" height="96" aria-label="Selected asset preview"></canvas>
+    <div>
+      <strong></strong>
+      <p></p>
+      <span class="asset-anchor-caption"></span>
+    </div>
+  </div>
+  <div class="asset-modes" role="group" aria-label="Stamp placement">
+    <button type="button" data-asset-mode="single" aria-pressed="true">
+      Single
+    </button><button
+      type="button"
+      data-asset-mode="repeat"
+      aria-pressed="false"
+    >
+      Repeat
+    </button><button
+      type="button"
+      data-asset-mode="scatter"
+      aria-pressed="false"
+    >
+      Scatter
+    </button>
+  </div>
+  <div class="asset-transform">
+    <label
+      >Scale<select aria-label="Asset scale">
+        <option value="1">1×</option>
+        <option value="2">2×</option>
+        <option value="3">3×</option>
+        <option value="4">4×</option>
+      </select></label
+    ><label
+      >Rotate<select aria-label="Asset rotation">
+        <option value="0">0°</option>
+        <option value="1">90°</option>
+        <option value="2">180°</option>
+        <option value="3">270°</option>
+      </select></label
+    ><label><input type="checkbox" aria-label="Flip asset"> Flip</label>
+  </div>
+  <div class="asset-spacing">
+    <label
+      >Spacing
+      <input
+        type="number"
+        value="16"
+        min="1"
+        max="512"
+        aria-label="Stamp spacing"
+      ></label
+    ><label
+      >Scatter count
+      <input
+        type="number"
+        value="5"
+        min="1"
+        max="32"
+        aria-label="Scatter count"
+      ></label
+    >
+  </div>
+  <button type="button" class="asset-place" data-asset-action="place">
+    Place on canvas
+  </button>
+  <div class="asset-row">
+    <button type="button" data-asset-action="edit">Edit asset</button
+    ><button type="button" data-asset-action="copy">Add to My library</button
+    ><button type="button" data-asset-action="update-copies">
+      Update placed copies
+    </button>
+  </div>
+  <div class="asset-row">
+    <button type="button" data-asset-action="import">Import pack</button
+    ><button type="button" data-asset-action="export">Export library</button
+    ><button type="button" data-asset-action="export-one">Download asset</button
+    ><button type="button" data-asset-action="delete">
+      Remove from library
+    </button>
+  </div>
+  <input
+    type="file"
+    class="asset-file"
+    accept=".piskelasset,.piskelpack,.json,application/json"
+    hidden
+  >
+  <p class="asset-status" role="status" aria-live="polite">
+    My library is saved on this device. Export a pack to move or back it up.
+  </p>
+  <dialog class="asset-save-dialog" aria-label="Save as asset">
+    <form class="asset-save-form">
+      <h3>Save as asset</h3>
+      <div class="asset-save-layout">
+        <div>
+          <canvas
+            class="asset-save-preview"
+            width="192"
+            height="192"
+            aria-label="Asset placement anchor preview"
+          ></canvas><label
+            >Placement anchor<select
+              name="anchor"
+              aria-label="Placement anchor"
+            >
+              <option value="bottom">Bottom center</option>
+              <option value="center">Center</option>
+              <option value="top-left">Top left</option>
+              <option value="custom">Custom · click preview</option>
+            </select></label
+          >
+          <p class="asset-capture-size"></p>
+        </div>
+        <div class="asset-fields">
+          <label
+            >Name<input
+              name="name"
+              required
+              maxlength="80"
+              aria-label="Asset name"
+            ></label
+          ><label
+            >Source<select name="source" aria-label="Asset source">
+              <option value="selection">Selection</option>
+              <option value="layer">Current layer</option>
+              <option value="group">Layer group</option>
+              <option value="project">Whole artwork</option>
+            </select></label
+          ><label
+            >Frames<select name="frames" aria-label="Asset frames">
+              <option value="current">Current frame</option>
+              <option value="all">All frames</option>
+            </select></label
+          ><label
+            >Collection<input
+              name="collection"
+              value="My assets"
+              maxlength="80"
+              aria-label="Asset collection"
+            ></label
+          ><label class="asset-check"
+            ><input name="editable" type="checkbox" checked>
+            Keep layers editable</label
+          >
+          <p>Saved assets stay available across projects on this device.</p>
+        </div>
+      </div>
+      <p class="asset-save-status" role="status" aria-live="polite"></p>
+      <div class="asset-row">
+        <button type="button" data-asset-action="cancel-save">Cancel</button
+        ><button type="button" data-asset-action="download-draft">
+          Download asset
+        </button><button type="button" data-asset-action="update" hidden>
+          Update saved asset
+        </button><button type="submit">Save as new asset</button>
+      </div>
+    </form>
+  </dialog>
+  <dialog class="asset-import-dialog" aria-label="Import asset pack">
+    <h3>Import asset pack</h3>
+    <p class="asset-import-summary"></p>
+    <p>
+      New assets are added as independent copies. Existing assets and projects
+      stay available.
+    </p>
+    <div class="asset-row">
+      <button type="button" data-asset-action="cancel-import">Cancel</button
+      ><button type="button" data-asset-action="confirm-import">
+        Add assets to My library
+      </button>
+    </div>
+  </dialog>
+</section>

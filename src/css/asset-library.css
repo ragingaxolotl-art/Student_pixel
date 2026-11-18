@@ -1,0 +1,324 @@
+.asset-library[hidden],
+.asset-library [hidden] {
+  display: none !important;
+}
+.asset-library {
+  position: fixed;
+  right: 12px;
+  top: 60px;
+  width: 330px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - 80px);
+  min-width: 260px;
+  min-height: 220px;
+  resize: both;
+  overflow: auto;
+  background: #292929;
+  border: 1px solid #777;
+  border-radius: 3px;
+  box-shadow: 0 8px 28px #0009;
+  z-index: 1600;
+  color: #ccc;
+  font:
+    12px Arial,
+    sans-serif;
+  padding: 0 12px 12px;
+  box-sizing: border-box;
+}
+.asset-library * {
+  box-sizing: border-box;
+}
+.asset-library button,
+.asset-library input,
+.asset-library select {
+  font: inherit;
+  color: #ddd;
+}
+.asset-library button {
+  background: #383838;
+  border: 1px solid #666;
+  border-radius: 2px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+.asset-library button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.asset-library input:not([type="checkbox"]),
+.asset-library select {
+  background: #383838;
+  border: 1px solid #777;
+  border-radius: 2px;
+  padding: 6px;
+  min-width: 0;
+  width: 100%;
+}
+.asset-library input[type="checkbox"] {
+  accent-color: gold;
+}
+.asset-library button:focus-visible,
+.asset-library input:focus-visible,
+.asset-library select:focus-visible {
+  outline: 2px solid gold;
+  outline-offset: 2px;
+}
+.asset-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #353535;
+  margin: 0 -12px 12px;
+  padding: 7px 8px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.asset-title .asset-drag {
+  border: 0;
+  background: transparent;
+  cursor: move;
+  touch-action: none;
+  flex: 1;
+  text-align: left;
+  min-height: 24px;
+}
+.asset-title > button:last-child {
+  padding: 2px 8px;
+}
+.asset-toolbar,
+.asset-row,
+.asset-tabs,
+.asset-modes,
+.asset-transform,
+.asset-spacing {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+.asset-toolbar button:first-child,
+.asset-place {
+  border-color: #ae9634;
+  color: #ffe365;
+  background: #484021;
+}
+.asset-tabs button,
+.asset-modes button {
+  flex: 1;
+}
+.asset-library button[aria-pressed="true"] {
+  border-color: gold;
+  color: gold;
+  background: #494124;
+}
+.asset-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  max-height: 245px;
+  overflow: auto;
+  margin-top: 10px;
+}
+.asset-grid button {
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  word-break: break-word;
+  padding: 6px 3px;
+}
+.asset-grid canvas {
+  width: 44px;
+  height: 44px;
+  image-rendering: pixelated;
+}
+.asset-empty {
+  font-size: 12px;
+  color: #aaa;
+  line-height: 1.5;
+  margin: 14px 0;
+}
+.asset-detail {
+  display: flex;
+  gap: 10px;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid #555;
+  align-items: center;
+}
+.asset-detail canvas {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  background:
+    repeating-conic-gradient(#424242 0% 25%, #353535 0% 50%) 0 0 / 12px 12px;
+  flex: none;
+}
+.asset-detail strong {
+  font-weight: 500;
+  color: #eee;
+  overflow-wrap: anywhere;
+}
+.asset-detail p,
+.asset-anchor-caption {
+  font-size: 11px;
+  color: #aaa;
+  margin: 6px 0;
+  line-height: 1.4;
+}
+.asset-transform > label {
+  flex: 1;
+  min-width: 55px;
+}
+.asset-transform label:last-child {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding-top: 15px;
+}
+.asset-library label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 11px;
+  color: #bbb;
+}
+.asset-spacing > label {
+  flex: 1;
+  min-width: 80px;
+}
+.asset-place {
+  width: 100%;
+}
+.asset-row button {
+  flex: 1;
+  min-width: 110px;
+  font-size: 11px;
+}
+.asset-status,
+.asset-save-status {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #ccc;
+  overflow-wrap: anywhere;
+}
+.asset-status.asset-error,
+.asset-save-status.asset-error {
+  color: #ffb5a6;
+}
+.asset-library dialog {
+  color: #ccc;
+  background: #292929;
+  border: 1px solid #777;
+  border-radius: 4px;
+  padding: 18px;
+  width: 600px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - 20px);
+  overflow: auto;
+  box-shadow: 0 12px 40px #0009;
+}
+.asset-library dialog::backdrop {
+  background: #000a;
+}
+.asset-library dialog h3 {
+  font:
+    500 15px Arial,
+    sans-serif;
+  color: #eee;
+  margin: 0 0 16px;
+}
+.asset-save-layout {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 20px;
+}
+.asset-save-preview {
+  width: 180px;
+  height: 180px;
+  background:
+    repeating-conic-gradient(#424242 0% 25%, #353535 0% 50%) 0 0 / 16px 16px;
+  image-rendering: pixelated;
+  cursor: crosshair;
+}
+.asset-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.asset-library .asset-check {
+  flex-direction: row;
+  align-items: center;
+}
+.asset-fields p,
+.asset-capture-size,
+.asset-import-dialog p {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #aaa;
+}
+.asset-save-dialog .asset-row {
+  border-top: 1px solid #555;
+  padding-top: 12px;
+}
+.asset-save-dialog .asset-row button:last-child {
+  color: gold;
+  border-color: #a48b2a;
+}
+.asset-layer-save {
+  font:
+    11px Arial,
+    sans-serif;
+  color: #ddd;
+  background: #383838;
+  border: 1px solid #666;
+  border-radius: 2px;
+  padding: 3px 6px;
+  margin: 3px 0;
+}
+.asset-stamping #drawing-canvas-container {
+  cursor: crosshair !important;
+}
+@media (max-width: 520px) {
+  .asset-library {
+    top: 48px;
+    max-height: calc(100dvh - 56px);
+    right: 8px;
+  }
+  .asset-save-layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .asset-save-layout > div:first-child {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 8px;
+  }
+  .asset-save-preview {
+    width: 110px;
+    height: 110px;
+  }
+  .asset-save-layout > div:first-child > label {
+    align-self: center;
+  }
+  .asset-capture-size {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+  .asset-library dialog {
+    padding: 12px;
+  }
+}
+@media (pointer: coarse) {
+  .asset-library button {
+    min-height: 36px;
+  }
+  .asset-library input,
+  .asset-library select {
+    font-size: 16px;
+  }
+}

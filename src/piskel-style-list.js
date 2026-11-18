@@ -11,6 +11,7 @@ exports.styles = [
   "css/dither-options.css",
   "css/shape-options.css",
   "css/paint-options.css",
+  "css/asset-library.css",
   "css/font-icon.css",
   "css/forms.css",
   "css/settings.css",

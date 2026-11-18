@@ -141,10 +141,21 @@
   };
 
   ns.Piskel.prototype.getHash = function () {
-    return this.layers
+    var pixels = this.layers
       .map(function (layer) {
         return layer.getHash();
       })
       .join("-");
+    const assets = this.toolState.assetLibrary,
+      editing = this.toolState.assetEditing;
+    if (!assets && !editing) {
+      return pixels;
+    }
+    const text = JSON.stringify([assets || null, editing || null]);
+    let hash = 2166136261;
+    for (let i = 0; i < text.length; i++) {
+      hash = Math.imul(hash ^ text.charCodeAt(i), 16777619);
+    }
+    return pixels + ":assets:" + (hash >>> 0);
   };
 })();
