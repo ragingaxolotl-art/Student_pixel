@@ -123,6 +123,61 @@
               { at: 30.6, title: "Save the rig" }
             ],
             duration: "0:33"
+          },
+          {
+            title: "Build a walk cycle",
+            description:
+              "Build a 24-frame in-place practice cycle: set floor and head guides, record contact and passing poses, close the loop, preview timing and generate frames. Demonstrated on a smaller Tester working copy.",
+            file: "walk-cycle-tutorial.mp4",
+            voice: "Kleo",
+            duration: "2:32",
+            chapters: [
+              { at: 0.001, title: "Start with a fitted rig" },
+              { at: 15.712, title: "Set your floor and head guides" },
+              { at: 32.858, title: "Make the first contact pose" },
+              { at: 49.28, title: "Add a passing pose" },
+              { at: 66.814, title: "Make the opposite contact" },
+              { at: 82.547, title: "Add the second passing pose" },
+              { at: 99.314, title: "Close the loop" },
+              { at: 115.745, title: "Preview and refine the timing" },
+              { at: 134.983, title: "Generate and keep an editable copy" }
+            ]
+          },
+          {
+            title: "Fix knees and elbows",
+            description:
+              "Compare unlocked IK and bend directions, pin a knee while rotating its foot, keep locks different in each pose, and use the same technique on an elbow. Includes explained demonstrations.",
+            file: "knees-elbows-tutorial.mp4",
+            voice: "Kleo",
+            duration: "2:12",
+            chapters: [
+              { at: 0, title: "Choose the lower bone" },
+              { at: 15.986, title: "See how an unlocked foot behaves" },
+              { at: 31.865, title: "Choose the bend direction" },
+              { at: 48.392, title: "Lift the knee, then pin it" },
+              { at: 63.859, title: "Rotate the foot around the locked knee" },
+              { at: 81.44, title: "Keep locks different in each pose" },
+              { at: 99.828, title: "Use the same idea on an elbow" },
+              { at: 115.091, title: "Check the rig before fighting it" }
+            ]
+          },
+          {
+            title: "Custom joints and segments",
+            description:
+              "Create independent joints, connect or detach branches, attach inside a solid segment, compare Hinge and Flexible splits, and remove or undo an inserted joint. Includes explained demonstrations.",
+            file: "custom-joints-tutorial.mp4",
+            voice: "Kleo",
+            duration: "2:31",
+            chapters: [
+              { at: 0, title: "Pick the right joint tool" },
+              { at: 19.851, title: "Place an independent joint" },
+              { at: 37.255, title: "Connect or detach the new branch" },
+              { at: 56.831, title: "Attach inside a solid segment" },
+              { at: 76.01, title: "Split a segment with a hinge" },
+              { at: 95.059, title: "Compare flexible bending" },
+              { at: 114.319, title: "Remove a split and undo it" },
+              { at: 131.49, title: "Save the custom setup" }
+            ]
           }
         ];
         var topicLabel = document.createElement("label"),
@@ -224,7 +279,10 @@
           title.textContent = item.title;
           description.textContent = item.description;
           details.textContent =
-            item.duration + " · Bea / ElevenLabs narration · Guided cursor";
+            item.duration +
+            " · " +
+            (item.voice || "Bea") +
+            " / ElevenLabs narration · Guided cursor";
           video.setAttribute("aria-label", item.title + " video tutorial");
           video.src = new URL("tutorials/" + item.file, document.baseURI).href;
           video.load();

@@ -1,19 +1,25 @@
 import {test,expect} from '@playwright/test';
 import {openEditor} from './editor-helpers';
 test('Tutorials beside Clips describes and plays rigging, motion path and pelvis lessons without editing the project',async({page})=>{
+ test.setTimeout(60000);
  await openEditor(page);await page.getByRole('button',{name:'Puppet Studio',exact:true}).click();await page.getByRole('button',{name:'Start rigging',exact:true}).click();
  const before=await page.evaluate(()=>window.pskl.utils.serialization.Serializer.serialize(window.pskl.app.piskelController.getPiskel()));
  const order=await page.locator('.puppet-top').evaluate(e=>Array.from(e.children).map(n=>n.textContent?.trim()));expect(order[2]).toMatch(/^Clips/);expect(order[3]).toBe('Tutorials');
  await page.getByRole('button',{name:'Tutorials',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Puppet Studio tutorials',exact:true});await expect(dialog).toBeVisible();
  const video=dialog.locator('video');
+ await expect(dialog.getByRole('combobox',{name:'Tutorial topic'}).locator('option')).toHaveCount(7);
  for(const [title,duration,description] of [
   ['Rigging and adjusting joints',169.726,'fit pivots and bone lengths'],
   ['Joints & Layers',253.294,'Includes step-by-step demonstrations'],
   ['Joint motion paths and settings',275.25,'Draw and edit a path'],
+  ["Build a walk cycle", 151.763, "in-place practice cycle"],
+  ["Fix knees and elbows", 131.975, "keep locks different in each pose"],
+  ["Custom joints and segments", 150.835, "Hinge and Flexible"],
   ['Connect both legs to a pelvis',33,'attach both legs']
  ] as const){
   await dialog.getByRole('combobox',{name:'Tutorial topic'}).selectOption({label:title});
   await expect(dialog.locator('.puppet-tutorial-description')).toContainText(description);
+  if(['Build a walk cycle','Fix knees and elbows','Custom joints and segments'].includes(title)) await expect(dialog.locator('.puppet-tutorial-details')).toContainText('Kleo');
   await expect(dialog.getByRole('heading',{name:title,exact:true})).toBeVisible();
   await expect.poll(()=>video.evaluate((v:HTMLVideoElement)=>v.readyState)).toBeGreaterThanOrEqual(1);
   expect(await video.evaluate((v:HTMLVideoElement)=>v.duration)).toBeCloseTo(duration,0);
