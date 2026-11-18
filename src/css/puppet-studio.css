@@ -940,3 +940,23 @@
   max-height: 72vh;
   margin-top: 12px;
 }
+
+.puppet-tutorial-dialog label {
+  display: block;
+  margin: 8px 0;
+}
+.puppet-tutorial-dialog select {
+  max-width: 100%;
+}
+.puppet-tutorial-dialog h4 {
+  margin: 12px 0 6px;
+}
+.puppet-tutorial-description {
+  line-height: 1.5;
+  margin: 0;
+}
+.puppet-tutorial-details {
+  color: #ccc;
+  font-size: 12px;
+  margin: 6px 0;
+}

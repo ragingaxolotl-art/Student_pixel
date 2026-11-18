@@ -39,18 +39,62 @@
         dialog.className = "puppet-tutorial-dialog";
         dialog.setAttribute("aria-label", "Puppet Studio tutorials");
         var heading = document.createElement("h3");
-        heading.textContent = "Connect both legs to a pelvis";
+        heading.textContent = "Puppet Studio tutorials";
+        var topics = [
+          {
+            title: "Rigging and adjusting joints",
+            description:
+              "Start with separate artwork layers, choose a starting frame, place independent joints, fit pivots and bone lengths, assign layers, connect an arm through a shoulder hub, test bends and locks, and save your editable rig.",
+            file: "how-to-rig-bea.mp4",
+            duration: "2:50"
+          },
+          {
+            title: "Joint motion paths and settings",
+            description:
+              "Guide a hand or foot between two pose keys. Draw and edit a path, scrub the in-between frames, recognize limited reach, adjust easing and Hold, edit saved paths, and save or generate the animation.",
+            file: "joint-motion-path-tutorial-bea.mp4",
+            duration: "4:35"
+          },
+          {
+            title: "Connect both legs to a pelvis",
+            description:
+              "Place a pelvis connector on the body and attach both legs. Moving the body carries the limbs while each leg can still bend independently.",
+            file: "pelvis-connector.mp4",
+            duration: "0:33"
+          }
+        ];
+        var topicLabel = document.createElement("label"),
+          topic = document.createElement("select"),
+          title = document.createElement("h4"),
+          description = document.createElement("p"),
+          details = document.createElement("p");
+        topicLabel.textContent = "Tutorial ";
+        topic.setAttribute("aria-label", "Tutorial topic");
+        topics.forEach(function (item, index) {
+          topic.add(new Option(item.title, index));
+        });
+        topicLabel.append(topic);
+        description.className = "puppet-tutorial-description";
+        details.className = "puppet-tutorial-details";
         var close = document.createElement("button");
         close.type = "button";
         close.textContent = "Close tutorial";
         var video = document.createElement("video");
         video.controls = true;
         video.preload = "metadata";
-        video.setAttribute("aria-label", "Narrated pelvis connector tutorial");
-        video.src = new URL(
-          "tutorials/pelvis-connector.mp4",
-          document.baseURI
-        ).href;
+        var showTopic = function () {
+          var item = topics[Number(topic.value)];
+          video.pause();
+          title.textContent = item.title;
+          description.textContent = item.description;
+          details.textContent =
+            item.duration + " · Bea / ElevenLabs narration · Guided cursor";
+          video.setAttribute("aria-label", item.title + " video tutorial");
+          video.src = new URL("tutorials/" + item.file, document.baseURI).href;
+          video.load();
+        };
+        topic.addEventListener("change", showTopic);
+        showTopic();
         close.onclick = function () {
           video.pause();
           dialog.close();
@@ -63,7 +107,15 @@
         dialog.addEventListener("keydown", function (event) {
           event.stopPropagation();
         });
-        dialog.append(heading, close, video);
+        dialog.append(
+          heading,
+          close,
+          topicLabel,
+          title,
+          description,
+          details,
+          video
+        );
         this.owner.wrapper.append(dialog);
         dialog.showModal();
       },
