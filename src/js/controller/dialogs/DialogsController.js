@@ -2,6 +2,10 @@
   var ns = $.namespace("pskl.controller.dialogs");
 
   var dialogs = {
+    "tile-studio": {
+      template: "templates/dialogs/tile-studio.html",
+      controller: ns.TileStudioDialogController
+    },
     "particle-studio": {
       template: "templates/dialogs/particle-studio.html",
       controller: ns.ParticleStudioDialogController

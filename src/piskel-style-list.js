@@ -25,6 +25,7 @@ exports.styles = [
   "css/dialogs.css",
   "css/puppet-studio.css",
   "css/particle-studio.css",
+  "css/tile-studio.css",
   "css/dialogs-browse-backups.css",
   "css/dialogs-browse-local.css",
   "css/dialogs-cheatsheet.css",

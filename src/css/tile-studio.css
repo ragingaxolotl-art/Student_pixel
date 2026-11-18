@@ -1,0 +1,446 @@
+#dialog-container.tile-studio {
+  position: fixed;
+  inset: 3vh 2vw auto;
+  width: 96vw;
+  height: 94vh;
+  min-width: 0;
+  margin: 0;
+  overflow: visible;
+}
+.tile-dialog {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #252525;
+  color: #eee;
+  font:
+    12px Arial,
+    sans-serif;
+}
+.tile-dialog * {
+  box-sizing: border-box;
+}
+.tile-dialog button,
+.tile-dialog input,
+.tile-dialog select {
+  font: inherit;
+  color: inherit;
+}
+.tile-dialog button,
+.tile-dialog select,
+.tile-dialog input:not([type="checkbox"]):not([type="color"]) {
+  background: #363636;
+  border: 1px solid #666;
+  border-radius: 3px;
+  padding: 6px 8px;
+}
+.tile-dialog button {
+  cursor: pointer;
+}
+.tile-dialog button:hover,
+.tile-dialog button:focus-visible {
+  border-color: var(--highlight-color);
+}
+.tile-dialog button[aria-pressed="true"] {
+  color: #171717;
+  background: var(--highlight-color);
+  border-color: var(--highlight-color);
+}
+.tile-dialog button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.tile-heading,
+.tile-stagebar,
+.tile-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #111;
+  flex-shrink: 0;
+}
+.tile-heading strong {
+  font-size: 17px;
+}
+.tile-subtitle {
+  color: #aaa;
+  margin-right: auto;
+}
+.tile-heading .dialog-close {
+  position: static;
+  margin-left: auto;
+}
+.tile-stagebar [data-tile-action="save"] {
+  margin-left: auto;
+}
+.tile-workspace {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  overflow: auto;
+  grid-template-columns: 110px minmax(260px, 1fr) 260px;
+  grid-template-rows: minmax(240px, 1fr) 190px;
+}
+.tile-workspace section {
+  min-width: 0;
+  min-height: 0;
+  background: #303030;
+  border: 1px solid #484848;
+  overflow: auto;
+}
+.tile-workspace h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 8px;
+  color: #bbb;
+}
+.tile-workspace section:not(.tile-viewer) {
+  padding: 8px;
+}
+.tile-tools {
+  grid-row: 1 / 3;
+}
+.tile-tool-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.tile-tools label {
+  display: block;
+  margin-bottom: 10px;
+}
+.tile-map-controls {
+  display: grid;
+  gap: 6px;
+}
+.tile-viewer {
+  display: flex;
+  flex-direction: column;
+}
+.tile-viewer h4 {
+  padding: 8px;
+  margin: 0;
+}
+.tile-viewport {
+  overflow: auto;
+  flex: 1;
+  min-height: 100px;
+  background: #202020;
+}
+.tile-canvas {
+  display: block;
+  touch-action: none;
+  cursor: crosshair;
+}
+.tile-canvas,
+.tile-preview canvas,
+.tile-tile-list canvas {
+  image-rendering: pixelated;
+  background:
+    repeating-conic-gradient(#444 0% 25%, #393939 0% 50%) 0 / 16px 16px;
+}
+.tile-hint {
+  margin: 0;
+  padding: 7px;
+  color: #bbb;
+  line-height: 1.5;
+}
+.tile-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow: auto;
+}
+.tile-tileset {
+  flex: 1;
+  min-height: 140px !important;
+}
+.tile-tile-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: 5px;
+  padding: 3px;
+  max-height: 230px;
+  overflow: auto;
+}
+.tile-tile-list button {
+  padding: 4px;
+}
+.tile-tile-list canvas {
+  width: 32px;
+  height: 32px;
+  display: block;
+  margin: auto;
+}
+.tile-row {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: end;
+  margin-top: 8px;
+}
+.tile-properties label {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-right: 8px;
+}
+.tile-properties input[type="number"] {
+  width: 70px;
+}
+.tile-properties p {
+  color: #aaa;
+  margin: 5px 0;
+}
+.tile-properties {
+  grid-column: 2;
+}
+.tile-preview {
+  grid-column: 3;
+  grid-row: 2;
+}
+.tile-preview canvas {
+  max-width: 100%;
+  max-height: 140px;
+  display: block;
+  margin: auto;
+}
+.tile-tutorials {
+  grid-column: 1 / 4;
+}
+.tile-tutorial-text {
+  line-height: 1.6;
+  color: #ccc;
+}
+.tile-layer-list > div {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  margin: 5px 0;
+}
+.tile-layer-list [data-layer-select] {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tile-layer-list input[type="text"] {
+  width: 100%;
+}
+.tile-footer {
+  justify-content: space-between;
+  color: #aaa;
+  border-top: 1px solid #111;
+}
+.tile-footer [role="status"] {
+  color: var(--highlight-color);
+}
+.tile-panel-collapse {
+  float: right;
+  padding: 0 5px !important;
+  margin-left: 4px;
+}
+.tile-workspace
+  section[data-collapsed="true"]
+  > :not(.studio-panel-handle):not(h4) {
+  display: none;
+}
+.tile-workspace section[data-collapsed="true"] {
+  min-height: 55px !important;
+}
+@media (max-width: 800px) {
+  .tile-workspace {
+    grid-template-columns: 90px minmax(200px, 1fr);
+    grid-template-rows: 360px auto auto;
+  }
+  .tile-side {
+    grid-column: 2;
+  }
+  .tile-properties {
+    grid-column: 2;
+  }
+  .tile-preview {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .tile-tutorials {
+    grid-column: 1 / 3;
+  }
+  .tile-subtitle,
+  .tile-footer > span:last-child {
+    display: none;
+  }
+}
+
+.tile-dialog [hidden] {
+  display: none !important;
+}
+.tile-viewer[data-studio-floating] {
+  display: flex !important;
+}
+
+@media (min-width: 801px) {
+  .tile-workspace {
+    grid-template-columns: 110px minmax(260px, 1fr) 300px;
+    grid-template-rows: minmax(300px, 1fr);
+  }
+  .tile-tools {
+    grid-row: 1;
+  }
+  .tile-side {
+    display: block;
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .tile-side > section {
+    margin-bottom: 8px;
+  }
+  .tile-tileset {
+    min-height: 140px;
+  }
+  .tile-properties label {
+    margin-bottom: 6px;
+  }
+}
+
+.tile-paint-options input[type="number"] {
+  width: 70px;
+}
+.tile-paint-options input[type="range"] {
+  width: 85px;
+}
+.tile-drawing label,
+.tile-palette label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 9px;
+}
+.tile-drawing input[type="number"] {
+  width: 80px;
+}
+.tile-drawing p,
+.tile-palette p {
+  line-height: 1.5;
+  color: #aaa;
+}
+.tile-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(26px, 1fr));
+  gap: 4px;
+}
+.tile-swatches button {
+  min-height: 27px;
+  border: 1px solid #888;
+}
+.tile-viewport {
+  position: relative;
+}
+.tile-start {
+  position: absolute;
+  left: 15px;
+  top: 15px;
+  z-index: 1;
+}
+.tile-drawing,
+.tile-palette {
+  grid-column: 2;
+}
+.tile-draw-layer-list > div {
+  margin-bottom: 8px;
+}
+.tile-draw-layer-list input:not([type="checkbox"]) {
+  width: 100%;
+}
+.tile-draw-layer-list label {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.tile-draw-layers {
+  grid-column: 2;
+}
+
+.tile-stagebar .tile-resolution-controls {
+  margin: 0;
+}
+.tile-stagebar .tile-resolution-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10px;
+}
+.tile-stagebar .tile-resolution-controls input {
+  width: 65px;
+}
+.tile-stagebar .tile-resolution-controls select {
+  max-width: 190px;
+}
+
+/* Use the same sprite icons as the main editor, in a compact two-column rail. */
+.tile-tool-list {
+  display: grid;
+  grid-template-columns: repeat(2, 40px);
+  justify-content: center;
+  gap: 5px;
+}
+.tile-dialog .tile-tool-button {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  overflow: hidden;
+}
+.tile-tool-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.68);
+}
+.tile-shade-badge {
+  position: absolute;
+  right: 2px;
+  bottom: 1px;
+  min-width: 12px;
+  line-height: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  background: #202020;
+  color: #fff;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.tile-tool-button[data-tile-tool="darken"] .tile-tool-icon {
+  filter: brightness(0.65);
+}
+@media (max-width: 800px) {
+  .tile-tool-list {
+    grid-template-columns: repeat(2, 31px);
+    gap: 3px;
+  }
+  .tile-dialog .tile-tool-button {
+    width: 31px;
+    height: 35px;
+  }
+  .tile-tool-icon {
+    transform: translate(-50%, -50%) scale(0.57);
+  }
+}
+
+.tile-repeat-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.tile-repeat-control input {
+  width: 55px;
+}

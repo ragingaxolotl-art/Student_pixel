@@ -147,6 +147,12 @@
           $.publish(Events.DIALOG_SHOW, [{ dialogId: "particle-studio" }]);
         });
 
+      document
+        .querySelector("[data-open-tiles]")
+        .addEventListener("click", function () {
+          $.publish(Events.DIALOG_SHOW, [{ dialogId: "tile-studio" }]);
+        });
+
       this.progressBarController = new pskl.controller.ProgressBarController();
       this.progressBarController.init();
 

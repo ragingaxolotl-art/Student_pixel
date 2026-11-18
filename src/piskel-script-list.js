@@ -206,6 +206,11 @@ exports.scripts = [
   "js/controller/dialogs/PuppetAnimatorControls.js",
   "js/controller/dialogs/PuppetTransformControls.js",
   "js/controller/dialogs/PuppetConnectionControls.js",
+  "js/utils/TileStudioUtils.js",
+  "js/controller/dialogs/TileStudioDialogController.js",
+  "js/controller/dialogs/TileStudioCanvas.js",
+  "js/controller/dialogs/TileStudioPaint.js",
+  "js/controller/dialogs/TileStudioLayers.js",
   "js/controller/dialogs/StudioPanels.js",
   "js/controller/dialogs/DialogsController.js",
 
